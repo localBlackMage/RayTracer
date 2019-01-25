@@ -118,5 +118,8 @@
     <ClInclude Include="Metal.h">
       <Filter>Source Files\Materials</Filter>
     </ClInclude>
+    <ClInclude Include="Interval.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

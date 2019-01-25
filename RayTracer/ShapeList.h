@@ -17,7 +17,7 @@ public:
         m_uListSize(a_uNumShapes)
     {}
 
-    virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, HitData& a_Hit) const;
+    virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
 };
 
 #endif //SHAPE_LIST_H

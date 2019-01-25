@@ -8,6 +8,8 @@
 #include "NiceTypes.h"
 #include "MathLibs.h"
 
+#include "Interval.h"
+
 #include "Shape.h"
 #include "Sphere.h"
 

@@ -17,7 +17,7 @@ public:
     inline const Vec3& Center() const { return m_vCenter; }
     inline float Radius() const { return m_fRadius; }
 
-    virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, HitData& a_Hit) const;
+    virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
 };
 
 #endif //SPHERE_H

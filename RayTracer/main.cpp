@@ -2,7 +2,7 @@
 
 Vec3 Color(const Ray& a_Ray, Shape * a_World, int a_iDepth)
 {
-    HitData hData;
+    Intersection hData;
     if (a_World->Hit(a_Ray, 0.0001f, FLT_MAX, hData))
     {
         Ray scattered;
@@ -35,7 +35,7 @@ int main()
 {
     int nx = 800;
     int ny = 400;
-    int ns = 10;
+    int ns = 1000;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     const uint32 NUM_OBJS = 4;

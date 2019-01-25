@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-bool ShapeList::Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, HitData& a_Hit) const
+bool ShapeList::Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const
 {
-    HitData hData;
+    Intersection hData;
     bool hitAnything = false;
     float closestSoFar = a_fTMax;
 

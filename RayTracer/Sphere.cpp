@@ -10,7 +10,7 @@ Sphere::Sphere(Vec3 a_vCenter, float a_fRadius, Material* a_pMaterial) :
 Sphere::~Sphere()
 {}
 
-bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, HitData & a_Hit) const
+bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a_Hit) const
 {
     Vec3 oc = a_Ray.Origin() - m_vCenter;
     float a = Vec3::Dot(a_Ray.Direction(), a_Ray.Direction());

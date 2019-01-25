@@ -13,7 +13,7 @@ public:
     Lambertian(const Vec3& a_Albedo);
     ~Lambertian();
 
-    virtual bool Scatter(const Ray& a_RayIn, const HitData& a_HitData, Vec3& a_vAttentuation, Ray& a_RayOut) const;
+    virtual bool Scatter(const Ray& a_RayIn, const Intersection& a_HitData, Vec3& a_vAttentuation, Ray& a_RayOut) const;
 };
 
 #endif //LAMBERTIAN_H
