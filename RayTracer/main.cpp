@@ -5,14 +5,19 @@ Vec3 Color(const Ray& a_Ray, Shape * a_World, int a_iDepth)
     Intersection hData;
     if (a_World->Hit(a_Ray, 0.0001f, FLT_MAX, hData))
     {
-        Ray scattered;
-        Vec3 attenuation;
-        if (a_iDepth < 50 && hData.m_pMaterial->Scatter(a_Ray, hData, attenuation, scattered))
-        {
-            return attenuation * Color(scattered, a_World, a_iDepth + 1);
-        }
-        else
-            return Vec3(0, 0, 0, 1);
+        //Ray scattered;
+        //Vec3 attenuation;
+        //if (a_iDepth < 50 && hData.m_pMaterial->Scatter(a_Ray, hData, attenuation, scattered))
+        //{
+        //    return attenuation * Color(scattered, a_World, a_iDepth + 1);
+        //}
+        //else
+        //    return Vec3(0, 0, 0, 1);
+
+        //return static_cast<Lambertian*>(hData.m_pMaterial)->Albedo();
+        //float depth = hData.m_fT / 10.f;
+        //return Vec3(depth, depth, depth);
+        return Vec3(fabsf(hData.m_vNormal.x), fabsf(hData.m_vNormal.y), fabsf(hData.m_vNormal.z));
     }
     else
     {
@@ -35,15 +40,20 @@ int main()
 {
     int nx = 800;
     int ny = 400;
-    int ns = 1000;
+    int ns = 10;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     const uint32 NUM_OBJS = 4;
     Shape * list[NUM_OBJS];
-    list[0] = new Sphere(Vec3(0, 0, -1), 0.5f, new Lambertian(Vec3(0.8f, 0.3f, 0.3f)));
-    list[1] = new Sphere(Vec3(0, -100.5f, -1), 100.f, new Lambertian(Vec3(0.8f, 0.8f, 0.0f)));
-    list[2] = new Sphere(Vec3(1, 0, -1), 0.5f, new Metal(Vec3(0.8f, 0.6f, 0.2f), 0.3f));
-    list[3] = new Sphere(Vec3(-1, 0, -1), 0.5f, new Metal(Vec3(0.8f, 0.8f, 0.8f), 1.f));
+    list[0] = new Sphere(Vec3(0, -100.5f, -1), 100.f, new Lambertian(Vec3(0.8f, 0.8f, 0.0f))); // Floor
+    list[1] = new AABCube(Vec3(-1.5f, 0.f, -3.f), Vec3(1, 1, 1), new Lambertian(Vec3(0.0f, 0.0f, 0.8f)));
+    list[2] = new Sphere(Vec3(2, 0, -3), 0.5f, new Lambertian(Vec3(0.8f, 0.3f, 0.3f)));
+
+    list[3] = new Cyllinder(Vec3(0, 1, -3), 5.f, 1.f, Quaternion(1, 0, 0, 0), new Lambertian(Vec3(0.8f, 0.0f, 0.0f)));
+    //list[1] = new Cube(Vec3(2, 0, -3), 1.f, 1.f, 1.f, Quaternion::FromEulerAnglesDegrees(0, 90.f, 0), new Lambertian(Vec3(0.0f, 0.0f, 0.8f)));
+    
+    //list[2] = new Sphere(Vec3(1, 0, -1), 0.5f, new Metal(Vec3(0.8f, 0.6f, 0.2f), 0.3f));
+    //list[3] = new Sphere(Vec3(-1, 0, -1), 0.5f, new Metal(Vec3(0.8f, 0.8f, 0.8f), 1.f));
     ShapeList * World = new ShapeList(list, NUM_OBJS);
 
     Camera cam;

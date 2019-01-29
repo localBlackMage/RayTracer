@@ -52,7 +52,8 @@ public:
 	void Negate();
 	float SquareLength() const;
 	float Length() const;
-	void Normalize();
+	Vec3& Normalize();
+    float Dot(const Vec3& v) const;
 	bool IsVectorZero(float error = EPSILON) const;
 
 	static float SquareDistance(const Vec3& vector0, const Vec3& vector1);

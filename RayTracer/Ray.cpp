@@ -3,20 +3,20 @@
 Ray::Ray()
 {}
 
-Ray::Ray(const Vec3 & a, const Vec3 & b) : 
-    m_A(a),
-    m_B(b)
+Ray::Ray(const Vec3 & a_vOrigin, const Vec3 & a_vDirection) :
+    m_vOrigin(a_vOrigin),
+    m_vDirection(a_vDirection)
 {}
 
 Ray::Ray(const Ray & rhs) : 
-    m_A(rhs.m_A),
-    m_B(rhs.m_B)
+    m_vOrigin(rhs.m_vOrigin),
+    m_vDirection(rhs.m_vDirection)
 {}
 
 Ray Ray::operator=(const Ray & rhs)
 {
-    m_A = rhs.m_A;
-    m_B = rhs.m_B;
+    m_vOrigin = rhs.m_vOrigin;
+    m_vDirection = rhs.m_vDirection;
     return *this;
 }
 
@@ -24,5 +24,5 @@ Ray::~Ray() {}
 
 Vec3 Ray::PointAt(const float & a_fT) const
 {
-    return m_A + a_fT * m_B;
+    return m_vOrigin + a_fT * m_vDirection;
 }

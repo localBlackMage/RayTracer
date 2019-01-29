@@ -1,32 +1,18 @@
 #include "stdafx.h"
 
-Quaternion::Quaternion() :
-    r(1), 
-    i(0), 
-    j(0), 
-    k(0) 
-{}
-
-Quaternion::Quaternion(const float & _r, const float & _i, const float & _j, const float & _k) :
-    r(_r), 
-    i(_i), 
-    j(_j), 
-    k(_k) 
-{}
-
 Quaternion::Quaternion(const Quaternion & rhs) : 
-    r(rhs.r),
-    i(rhs.i),
-    j(rhs.j), 
-    k(rhs.k) 
+    w(rhs.w),
+    x(rhs.x),
+    y(rhs.y), 
+    z(rhs.z) 
 {}
 
 Quaternion & Quaternion::operator=(const Quaternion & rhs)
 {
-    r = rhs.r;
-    i = rhs.i;
-    j = rhs.j;
-    k = rhs.k;
+    w = rhs.w;
+    x = rhs.x;
+    y = rhs.y;
+    z = rhs.z;
     return *this;
 }
 
@@ -34,23 +20,26 @@ Quaternion & Quaternion::operator=(const Quaternion & rhs)
 
 void Quaternion::operator *=(const Quaternion &multiplier)
 {
-    r = r*multiplier.r - i*multiplier.i -
-        j*multiplier.j - k*multiplier.k;
-    i = r*multiplier.i + i*multiplier.r +
-        j*multiplier.k - k*multiplier.j;
-    j = r*multiplier.j + j*multiplier.r +
-        k*multiplier.i - i*multiplier.k;
-    k = r*multiplier.k + k*multiplier.r +
-        i*multiplier.j - j*multiplier.i;
+    Quaternion q(
+        w*multiplier.w - x * multiplier.x - y * multiplier.y - z * multiplier.z,
+        w*multiplier.x + x * multiplier.w + y * multiplier.z - z * multiplier.y,
+        w*multiplier.y + y * multiplier.w + z * multiplier.x - x * multiplier.z,
+        w*multiplier.z + z * multiplier.w + x * multiplier.y - y * multiplier.x
+    );
+    
+    w = q.w;
+    x = q.x;
+    y = q.y;
+    z = q.z;
 }
 
 Quaternion Quaternion::operator+(const Quaternion & Q2) const
 {
     return Quaternion(
-        r + Q2.r,
-        i + Q2.i,
-        j + Q2.j,
-        k + Q2.k
+        w + Q2.w,
+        x + Q2.x,
+        y + Q2.y,
+        z + Q2.z
     );
 }
 
@@ -58,71 +47,68 @@ Quaternion Quaternion::operator+(const Vec3 & vec) const
 {
     Quaternion q = Quaternion(0, vec.x, vec.y, vec.z) * (*this);    
     return Quaternion(
-        r + q.r * 0.5f,
-        i + q.i * 0.5f,
-        j + q.j * 0.5f,
-        k + q.k * 0.5f
+        w + q.w * 0.5f,
+        x + q.x * 0.5f,
+        y + q.y * 0.5f,
+        z + q.z * 0.5f
     );
 }
 
 Quaternion Quaternion::operator-(const Quaternion & Q2) const
 {
     return Quaternion(
-        r - Q2.r,
-        i - Q2.i,
-        j - Q2.j,
-        k - Q2.k
+        w - Q2.w,
+        x - Q2.x,
+        y - Q2.y,
+        z - Q2.z
     );
 }
 
 Quaternion Quaternion::operator*(const Quaternion & Q2) const
 {
     return Quaternion(
-        r * Q2.r,
-        i * Q2.i,
-        j * Q2.j,
-        k * Q2.k
+        w*Q2.w - x * Q2.x - y * Q2.y - y * Q2.y,
+        w*Q2.x + x * Q2.w + y * Q2.y - y * Q2.y,
+        w*Q2.y + y * Q2.w + y * Q2.x - x * Q2.y,
+        w*Q2.y + y * Q2.w + x * Q2.y - y * Q2.x
     );
 }
 
 Quaternion Quaternion::operator*(const float & scalar) const
 {
     return Quaternion(
-        r * scalar,
-        i * scalar,
-        j * scalar,
-        k * scalar
+        w * scalar,
+        x * scalar,
+        y * scalar,
+        z * scalar
     );
 }
 
 Quaternion Quaternion::operator/(const float & div) const
 {
     return Quaternion(
-        r / div,
-        i / div,
-        j / div,
-        k / div
+        w / div,
+        x / div,
+        y / div,
+        z / div
     );
 }
 
 #pragma endregion
 
-void Quaternion::Normalize()
+Quaternion& Quaternion::Normalize()
 {
-    float d = r * r + i * i + j * j + k * k;
-
-    // Check for zero length quaternion, and use the no-rotation
-    // quaternion in that case.
-    if (d < FLOAT_EPSILON) {
-        r = 1;
-        return;
+    // compute the magnitude and divide through it
+    const float mag = sqrt(x*x + y * y + z * z + w * w);
+    if (mag)
+    {
+        const float invMag = 1.f / mag;
+        x *= invMag;
+        y *= invMag;
+        z *= invMag;
+        w *= invMag;
     }
-
-    d = ((float)1.0) / sqrtf(d);
-    r *= d;
-    i *= d;
-    j *= d;
-    k *= d;
+    return *this;
 }
 
 void Quaternion::AddScaledVector(const Vec3& vector, float scale)
@@ -132,10 +118,10 @@ void Quaternion::AddScaledVector(const Vec3& vector, float scale)
         vector.y * scale,
         vector.z * scale);
     q *= *this;
-    r += q.r * 0.5f;
-    i += q.i * 0.5f;
-    j += q.j * 0.5f;
-    k += q.k * 0.5f;
+    w += q.w * 0.5f;
+    x += q.x * 0.5f;
+    y += q.y * 0.5f;
+    z += q.z * 0.5f;
 }
 
 void Quaternion::RotateByVector(const Vec3& vector)
@@ -146,55 +132,88 @@ void Quaternion::RotateByVector(const Vec3& vector)
 
 void Quaternion::Identity()
 {
-    r = 1;
-    i = j = k = 0;
+    w = 1;
+    x = y = z = 0;
 }
 
 float Quaternion::Length() const
 {
-    return sqrtf(r * r + i * i + j * j + k * k);
+    return sqrtf(w * w + x * x + y * y + z * z);
 }
 
 float Quaternion::Dot(const Quaternion& Q2)
 {
-    return r * Q2.r + i * Q2.i + j * Q2.j + k * Q2.k;
+    return w * Q2.w + x * Q2.x + y * Q2.y + z * Q2.z;
 }
 
-void Quaternion::Conjugate()
+Quaternion& Quaternion::Conjugate()
 {
-    i = -i;
-    j = -j;
-    k = -k;
+    x = -x;
+    y = -y;
+    z = -z;
+    return *this;
 }
 
 void Quaternion::Negate()
 {
-    r = -r;
-    i = -i;
-    j = -j;
-    k = -k;
+    w = -w;
+    x = -x;
+    y = -y;
+    z = -z;
+}
+
+Vec3 Quaternion::RotateVector(const Vec3 & vector) const
+{
+    Quaternion q2(0.f, vector.x, vector.y, vector.z), q = *this, qinv = q;
+    q.Conjugate();
+
+    q = q * q2 * qinv;
+    return Vec3(q.x, q.y, q.z, vector.w);
 }
 
 Matrix3x3 Quaternion::Matrix()
 {
     return Matrix3x3(
-        (1.f) - (2.f) * (j * j + k * k), (2.f) * (i * j - k * r), (2.f) * (i * k + j * r),
-        (2.f) * (i * j + k * r), (1.f) - (2.f) * (i * i + k * k), (2.f) * (j * k - i * r),
-        (2.f) * (i * k - j * r), (2.f) * (j * k + i * r), (1.f) - (2.f) * (i * i + j * j)
+        (1.f) - (2.f) * (y * y + z * z), (2.f) * (x * y - z * w), (2.f) * (x * z + y * w),
+        (2.f) * (x * y + z * w), (1.f) - (2.f) * (x * x + z * z), (2.f) * (y * z - x * w),
+        (2.f) * (x * z - y * w), (2.f) * (y * z + x * w), (1.f) - (2.f) * (x * x + y * y)
     );
 }
 
 #pragma region Static Methods
 
+Quaternion Quaternion::FromEulerAnglesRadians(float a_fYaw, float a_fPitch, float a_fRoll)
+{
+    // Abbreviations for the various angular functions
+    float cy = cosf(a_fYaw * 0.5f);
+    float sy = sinf(a_fYaw * 0.5f);
+    float cp = cosf(a_fPitch * 0.5f);
+    float sp = sinf(a_fPitch * 0.5f);
+    float cr = cosf(a_fRoll * 0.5f);
+    float sr = sinf(a_fRoll * 0.5f);
+
+    return Quaternion(
+        cy * cp * cr + sy * sp * sr, // w
+        cy * cp * sr - sy * sp * cr, // x 
+        sy * cp * sr + cy * sp * cr, // y
+        sy * cp * cr - cy * sp * sr  // z
+    ).Normalize();
+}
+
+Quaternion Quaternion::FromEulerAnglesDegrees(float a_fYaw, float a_fPitch, float a_fRoll)
+{
+    return FromEulerAnglesRadians(a_fYaw * DEG_TO_RAD, a_fPitch * DEG_TO_RAD, a_fRoll * DEG_TO_RAD);
+}
+
 Vec3 Quaternion::QuaternionToVec3(const Quaternion& q)
 {
     Vec3 result;
-    float ysqr = q.j * q.j;
-    float t0 = -2.0f * (ysqr + q.k * q.k) + 1.0f;
-    float t1 = +2.0f * (q.i * q.j - q.r * q.k);
-    float t2 = -2.0f * (q.i * q.k + q.r * q.j);
-    float t3 = +2.0f * (q.j * q.k - q.r * q.i);
-    float t4 = -2.0f * (q.i * q.i + ysqr) + 1.0f;
+    float ysqr = q.y * q.y;
+    float t0 = -2.0f * (ysqr + q.z * q.z) + 1.0f;
+    float t1 = +2.0f * (q.x * q.y - q.w * q.z);
+    float t2 = -2.0f * (q.x * q.z + q.w * q.y);
+    float t3 = +2.0f * (q.y * q.z - q.w * q.x);
+    float t4 = -2.0f * (q.x * q.x + ysqr) + 1.0f;
 
     t2 = t2 > 1.0f ? 1.0f : t2;
     t2 = t2 < -1.0f ? -1.0f : t2;
@@ -223,33 +242,33 @@ Quaternion Quaternion::IdentityQuaterion()
 Quaternion Quaternion::ScalarMult(Quaternion Q, float value)
 {
     return Quaternion(
-        Q.r * value,
-        Q.i * value,
-        Q.j * value,
-        Q.k * value
+        Q.w * value,
+        Q.x * value,
+        Q.y * value,
+        Q.z * value
     );
 }
 
 Quaternion Quaternion::ScalarDiv(Quaternion Q, float value)
 {
     return Quaternion(
-        Q.r / value,
-        Q.i / value,
-        Q.j / value,
-        Q.k / value
+        Q.w / value,
+        Q.x / value,
+        Q.y / value,
+        Q.z / value
     );
 }
 
 void Quaternion::Conjugate(Quaternion& Q)
 {
-    Q.i = -Q.i;
-    Q.j = -Q.j;
-    Q.k = -Q.k;
+    Q.x = -Q.x;
+    Q.y = -Q.y;
+    Q.z = -Q.z;
 }
 
 float Quaternion::Dot(Quaternion Q1, Quaternion Q2)
 {
-    return Q1.r * Q2.r + Q1.i * Q2.i + Q1.j * Q2.j + Q1.k * Q2.k;
+    return Q1.w * Q2.w + Q1.x * Q2.x + Q1.y * Q2.y + Q1.z * Q2.z;
 }
 
 float Quaternion::Length(const Quaternion& Q)
@@ -259,14 +278,90 @@ float Quaternion::Length(const Quaternion& Q)
 
 Quaternion Quaternion::Inverse(Quaternion Q)
 {
-    float divided = Q.r * Q.r + Q.i * Q.i + Q.j * Q.j + Q.k * Q.k;
+    float divided = Q.w * Q.w + Q.x * Q.x + Q.y * Q.y + Q.z * Q.z;
 
-    Q.r = Q.r / divided;
-    Q.i = -Q.i / divided;
-    Q.j = -Q.j / divided;
-    Q.k = -Q.k / divided;
+    Q.w = Q.w / divided;
+    Q.x = -Q.x / divided;
+    Q.y = -Q.y / divided;
+    Q.z = -Q.z / divided;
 
     return Q;
+}
+
+void Quaternion::Interpolate(Quaternion & pOut, const Quaternion & pStart, const Quaternion & pEnd, float pFactor)
+{
+    // calc cosine theta
+    float cosom = pStart.x * pEnd.x + pStart.y * pEnd.y + pStart.z * pEnd.z + pStart.w * pEnd.w;
+
+    // adjust signs (if necessary)
+    Quaternion end = pEnd;
+    if (cosom < 0.f)
+    {
+        cosom = -cosom;
+        end.x = -end.x;   // Reverse all signs
+        end.y = -end.y;
+        end.z = -end.z;
+        end.w = -end.w;
+    }
+
+    // Calculate coefficients
+    float sclp, sclq;
+    if ((1.f - cosom) > 0.0001f) // 0.0001 -> some epsillon
+    {
+        // Standard case (slerp)
+        float omega, sinom;
+        omega = acos(cosom); // extract theta from dot product's cos theta
+        sinom = sin(omega);
+        sclp = sin((1.f - pFactor) * omega) / sinom;
+        sclq = sin(pFactor * omega) / sinom;
+    }
+    else
+    {
+        // Very close, do linear interp (because it's faster)
+        sclp = 1.f - pFactor;
+        sclq = pFactor;
+    }
+
+    pOut.x = sclp * pStart.x + sclq * end.x;
+    pOut.y = sclp * pStart.y + sclq * end.y;
+    pOut.z = sclp * pStart.z + sclq * end.z;
+    pOut.w = sclp * pStart.w + sclq * end.w;
+}
+
+Quaternion Quaternion::FromTwoVectors(const Vec3 & a_vA, const Vec3 & a_vB)
+{
+    Vec3 a = a_vA, b = a_vB;
+    Vec3 v0 = a.Normalize();
+    Vec3 v1 = b.Normalize();
+    float c = v1.Dot(v0);
+
+    // if dot == -1, vectors are nearly opposites
+    // => accurately compute the rotation axis by computing the
+    //    intersection of the two planes. This is done by solving:
+    //       x^T v0 = 0
+    //       x^T v1 = 0
+    //    under the constraint:
+    //       ||x|| = 1
+    //    which yields a singular value problem
+    if (c < -1.f + FLOAT_EPSILON)
+    {
+        c = numext::maxi(c, -1));
+        Matrix<Scalar, 2, 3> m; m << v0.transpose(), v1.transpose();
+        JacobiSVD<Matrix<Scalar, 2, 3> > svd(m, ComputeFullV);
+        Vec3 axis = svd.matrixV().col(2);
+
+        float w2 = (1.f + c) * 0.5f;
+        this->w() = sqrtf(w2);
+        this->vec() = axis * sqrtf(1.f) - w2);
+        return derived();
+    }
+    Vec3 axis = v0.Cross(v1);
+    float s = sqrtf(1.f + c)*2.f);
+    float invs = 1.f / s;
+    this->vec() = axis * invs;
+    this->w = s * 0.5f;
+
+    return derived();
 }
 
 #pragma endregion

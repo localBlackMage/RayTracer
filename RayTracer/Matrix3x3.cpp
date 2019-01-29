@@ -501,15 +501,15 @@ void Matrix3x3::operator+=(const Matrix3x3 &o)
 
 void Matrix3x3::setOrientation(const Quaternion &q)
 {
-    m_matrix[0][0] = 1 - (2 * q.j*q.j + 2 * q.k*q.k);
-    m_matrix[0][1] = 2 * q.i*q.j + 2 * q.k*q.r;
-    m_matrix[0][2] = 2 * q.i*q.k - 2 * q.j*q.r;
-    m_matrix[1][0] = 2 * q.i*q.j - 2 * q.k*q.r;
-    m_matrix[1][1] = 1 - (2 * q.i*q.i + 2 * q.k*q.k);
-    m_matrix[1][2] = 2 * q.j*q.k + 2 * q.i*q.r;
-    m_matrix[2][0] = 2 * q.i*q.k + 2 * q.j*q.r;
-    m_matrix[2][1] = 2 * q.j*q.k - 2 * q.i*q.r;
-    m_matrix[2][2] = 1 - (2 * q.i*q.i + 2 * q.j*q.j);
+    m_matrix[0][0] = 1 - (2 * q.y*q.y + 2 * q.z*q.z);
+    m_matrix[0][1] = 2 * q.x*q.y + 2 * q.z*q.w;
+    m_matrix[0][2] = 2 * q.x*q.z - 2 * q.y*q.w;
+    m_matrix[1][0] = 2 * q.x*q.y - 2 * q.z*q.w;
+    m_matrix[1][1] = 1 - (2 * q.x*q.x + 2 * q.z*q.z);
+    m_matrix[1][2] = 2 * q.y*q.z + 2 * q.x*q.w;
+    m_matrix[2][0] = 2 * q.x*q.z + 2 * q.y*q.w;
+    m_matrix[2][1] = 2 * q.y*q.z - 2 * q.x*q.w;
+    m_matrix[2][2] = 1 - (2 * q.x*q.x + 2 * q.y*q.y);
 }
 #pragma endregion
 

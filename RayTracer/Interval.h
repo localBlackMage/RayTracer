@@ -11,6 +11,8 @@ struct Interval
     Vec3 m_vNormal0, m_vNormal1;
 };
 
+void SetMinMaxInterval(Interval& a_IntToSet, const Interval& a_OtherInt);
+
 struct Intersection
 {
     float m_fT;
@@ -19,5 +21,7 @@ struct Intersection
     Material* m_pMaterial;
     Interval m_Interval;
 };
+
+bool SetIntersectionFromLowestPositive(Intersection& a_Intersection, const Interval& a_Interval);
 
 #endif

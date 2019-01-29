@@ -6,17 +6,17 @@
 class Ray
 {
 protected:
-    Vec3 m_A, m_B;
+    Vec3 m_vOrigin, m_vDirection;
 
 public:
     Ray();
-    Ray(const Vec3& a, const Vec3& b);
+    Ray(const Vec3 & a_vOrigin, const Vec3 & a_vDirection);
     Ray(const Ray& rhs);
     Ray operator=(const Ray& rhs);
     ~Ray();
 
-    inline Vec3 Origin() const { return m_A; }
-    inline Vec3 Direction() const { return m_B; }
+    inline const Vec3& Origin() const { return m_vOrigin; }
+    inline const Vec3& Direction() const { return m_vDirection; }
     
     Vec3 PointAt(const float& a_fT) const;
 };

@@ -1,11 +1,13 @@
 #include "stdafx.h"
-#include "Sphere.h"
 
 Sphere::Sphere(Vec3 a_vCenter, float a_fRadius, Material* a_pMaterial) :
     Shape(a_pMaterial),
     m_vCenter(a_vCenter),
     m_fRadius(a_fRadius)
-{}
+{
+    float diameter = 2.f * m_fRadius;
+    m_pBoundingBox = new BoundingBox(this, m_vCenter, diameter, diameter, diameter);
+}
 
 Sphere::~Sphere()
 {}

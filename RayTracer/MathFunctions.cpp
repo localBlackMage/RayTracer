@@ -6,7 +6,6 @@ Author: <Holden Profit>
 - End Header --------------------------------------------------------*/
 
 #include "stdafx.h"
-#include "MathFunctions.h"
 
 std::unordered_map<unsigned short, std::vector<unsigned int> > pascalTriangle;
 
@@ -112,6 +111,16 @@ int RandomInt(int min, int max) {
 Vec3 Reflect(const Vec3 & a_vA, const Vec3 & a_vB)
 {
     return a_vA - 2.f * Vec3::Dot(a_vA, a_vB) * a_vB;
+}
+
+bool AreSameSign(const float & a_fA, const float & a_fB)
+{
+    return (a_fA >= 0.f && a_fB >= 0.f) || (a_fA < 0.f && a_fB < 0.f);
+}
+
+float GetDValueForPlane(const Vec3 & a_vNormal, const Vec3 & a_vPoint)
+{
+    return -a_vNormal.x * a_vPoint.x - a_vNormal.y * a_vPoint.y - a_vNormal.z * a_vPoint.z;
 }
 
 unsigned int GetPascalEntry(unsigned short degree, unsigned short index)

@@ -231,11 +231,17 @@ float Vec3::Length() const
     return sqrtf(SquareLength());
 }
 
-void Vec3::Normalize()
+Vec3& Vec3::Normalize()
 {
     if (x == 0 && y == 0 && z == 0)
-        return;
+        return *this;
     Div(Length());
+    return *this;
+}
+
+float Vec3::Dot(const Vec3 & v) const
+{
+    return x * v.x + y * v.y + z * v.z;
 }
 
 float Vec3::AngleRadians() const {
