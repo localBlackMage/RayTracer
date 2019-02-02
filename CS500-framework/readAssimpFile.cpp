@@ -3,15 +3,8 @@
 // into a structure suitable for the raytracer.
 ////////////////////////////////////////////////////////////////////////
 
-#include <string>
-#include <vector>
-
-#include "geom.h"
+#include "stdafx.h"
 #include "raytrace.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 void recurseModelNodes(Scene* scene,
                        const  aiScene* aiscene,
@@ -54,7 +47,7 @@ void recurseModelNodes(Scene* scene,
     aiMatrix3x3 normalTr = aiMatrix3x3(childTr); // Really should be inverse-transpose for full generality
      
     // Loop through this node's meshes
-    for (unsigned int i=0;  i<node->mNumMeshes; ++i) {
+    for (uint32 i=0;  i<node->mNumMeshes; ++i) {
         aiMesh* aimesh = aiscene->mMeshes[node->mMeshes[i]];
         printf("%d:%d ", aimesh->mNumVertices, aimesh->mNumFaces);
 
@@ -103,7 +96,7 @@ void recurseModelNodes(Scene* scene,
         for (unsigned int t=0;  t<aimesh->mNumFaces;  ++t) {
             aiFace* aiface = &aimesh->mFaces[t];
             //printf("%d: %d %d\n", t, aiface->mNumIndices, aimesh->mNumFaces);
-            for (int i=2;  i<aiface->mNumIndices;  i++) {
+            for (i=2;  i<aiface->mNumIndices;  i++) {
                 meshdata->triangles.push_back(TriData(aiface->mIndices[0],
                                                       aiface->mIndices[1],
                                                       aiface->mIndices[2])); } }

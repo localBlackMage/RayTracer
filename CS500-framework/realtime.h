@@ -1,16 +1,12 @@
+#pragma once
+
+#ifndef REALTIME_H
+#define REALTIME_H
+
 ////////////////////////////////////////////////////////////////////////////////
 // Temporary code.  Remove this from your raytracer.  This displays
 // the contents of a scene file in realtime in a GLUT window.
 ////////////////////////////////////////////////////////////////////////////////
-
-#include <string>
-#include <fstream>
-#include <vector>
-
-#include <glbinding/gl/gl.h>
-#include <glbinding/Binding.h>
-using namespace gl;
-#include <freeglut.h>
 
 const float Radians = PI/180.0f;    // Convert degrees to radians
 
@@ -122,3 +118,4 @@ public:
 };
 
 
+#endif //REALTIME_H

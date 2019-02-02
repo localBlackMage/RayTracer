@@ -24,7 +24,7 @@
     #include <time.h> 
 #endif
 
-#include "geom.h"
+#include "stdafx.h"
 #include "raytrace.h"
 
 // Read a scene file by parsing each line as a command and calling
@@ -47,7 +47,7 @@ void ReadScene(const std::string inName, Scene* scene)
         for (std::string s; lineStream >> s; ) { // Parses space-separated strings until EOL
             float f;
             //std::stringstream(s) >> f; // Parses an initial float into f, or zero if illegal
-            if (!(std::stringstream(s) >> f)) f = nan(""); // An alternate that produced NANs
+            if (!(std::stringstream(s) >> f)) f = nanf(""); // An alternate that produced NANs
             floats.push_back(f);
             strings.push_back(s); }
 
@@ -79,7 +79,8 @@ void WriteHdrImage(const std::string outName, const int width, const int height,
     rgbe_header_info info;
     char errbuf[100] = {0};
 
-    FILE* fp  =  fopen(outName.c_str(), "wb");
+    FILE* fp = nullptr;
+    fopen_s(&fp, outName.c_str(), "wb");
     info.valid = false;
     int r = RGBE_WriteHeader(fp, width, height, &info, errbuf);
     if (r != RGBE_RETURN_SUCCESS)

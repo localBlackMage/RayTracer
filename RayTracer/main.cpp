@@ -15,9 +15,9 @@ Vec3 Color(const Ray& a_Ray, Shape * a_World, int a_iDepth)
         //    return Vec3(0, 0, 0, 1);
 
         //return static_cast<Lambertian*>(hData.m_pMaterial)->Albedo();
-        //float depth = hData.m_fT / 10.f;
-        //return Vec3(depth, depth, depth);
-        return Vec3(fabsf(hData.m_vNormal.x), fabsf(hData.m_vNormal.y), fabsf(hData.m_vNormal.z));
+        float depth = hData.m_fT / 10.f;
+        return Vec3(depth, depth, depth);
+        //return Vec3(fabsf(hData.m_vNormal.x), fabsf(hData.m_vNormal.y), fabsf(hData.m_vNormal.z));
     }
     else
     {
@@ -48,8 +48,9 @@ int main()
     list[0] = new Sphere(Vec3(0, -100.5f, -1), 100.f, new Lambertian(Vec3(0.8f, 0.8f, 0.0f))); // Floor
     list[1] = new AABCube(Vec3(-1.5f, 0.f, -3.f), Vec3(1, 1, 1), new Lambertian(Vec3(0.0f, 0.0f, 0.8f)));
     list[2] = new Sphere(Vec3(2, 0, -3), 0.5f, new Lambertian(Vec3(0.8f, 0.3f, 0.3f)));
+    list[3] = new Triangle(Vec3(-1, 0, -3), Vec3(1, 0, -4), Vec3(0, 2, -5), Vec3(1,0,0), Vec3(1, 0, 0), Vec3(1, 0, 0), new Lambertian(Vec3(0.f, 1.0f, 0.0f)));
 
-    list[3] = new Cyllinder(Vec3(0, 1, -3), 5.f, 1.f, Quaternion(1, 0, 0, 0), new Lambertian(Vec3(0.8f, 0.0f, 0.0f)));
+    //list[3] = new Cyllinder(Vec3(0, 1, -3), 5.f, 1.f, Quaternion(1, 0, 0, 0), new Lambertian(Vec3(0.8f, 0.0f, 0.0f)));
     //list[1] = new Cube(Vec3(2, 0, -3), 1.f, 1.f, 1.f, Quaternion::FromEulerAnglesDegrees(0, 90.f, 0), new Lambertian(Vec3(0.0f, 0.0f, 0.8f)));
     
     //list[2] = new Sphere(Vec3(1, 0, -1), 0.5f, new Metal(Vec3(0.8f, 0.6f, 0.2f), 0.3f));

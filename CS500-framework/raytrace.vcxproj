@@ -61,8 +61,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -85,8 +84,7 @@
       <AdditionalIncludeDirectories>libs\freeglut;libs\assimp\include;libs</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;FREEGLUT_STATIC;_LIB;FREEGLUT_LIB_PRAGMAS=0;EIGEN_DONT_ALIGN_STATICALLY;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -108,14 +106,47 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoundingBox.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Cyllinder.cpp" />
+    <ClCompile Include="Interval.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="geom.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MathFunctions.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="raytrace.cpp" />
     <ClCompile Include="readAssimpFile.cpp" />
     <ClCompile Include="realtime.cpp" />
     <ClCompile Include="rgbe.cpp" />
+    <ClCompile Include="Shape.cpp" />
+    <ClCompile Include="ShapeList.cpp" />
+    <ClCompile Include="Slab.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp" />
+    <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="Cyllinder.h" />
+    <ClInclude Include="Interval.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MathDefines.h" />
+    <ClInclude Include="MathFunctions.h" />
+    <ClInclude Include="NiceTypes.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="realtime.h" />
     <ClInclude Include="geom.h" />
+    <ClInclude Include="Shape.h" />
+    <ClInclude Include="ShapeList.h" />
+    <ClInclude Include="Slab.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

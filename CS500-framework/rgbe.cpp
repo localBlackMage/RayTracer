@@ -2,11 +2,7 @@
  * WHILE THE AUTHORS HAVE TRIED TO ENSURE THE PROGRAM WORKS CORRECTLY,
  * IT IS STRICTLY USE AT YOUR OWN RISK.  */
 
-#include "rgbe.h"
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include "stdafx.h"
 
 /* This file contains code to read and write four byte rgbe file format
  developed by Greg Ward.  It handles the conversions between rgbe and
@@ -59,26 +55,26 @@ static int rgbe_error(int rgbe_error_code, const char *msg, char *errbuf)
   switch (rgbe_error_code) {
   case rgbe_read_error:
       if (errbuf)
-          strcpy (errbuf, "RGBE read error");
+          strcpy_s (errbuf, sizeof("RGBE read error")+1, "RGBE read error");
       else
           perror("RGBE read error");
     break;
   case rgbe_write_error:
       if (errbuf)
-          strcpy (errbuf, "RGBE write error");
+          strcpy_s (errbuf, sizeof("RGBE write error") + 1, "RGBE write error");
       else
           perror("RGBE write error");
     break;
   case rgbe_format_error:
       if (errbuf)
-          sprintf(errbuf,"RGBE bad file format: %s\n", msg);
+          sprintf_s(errbuf, sizeof("RGBE bad file format: %s\n") + 1, "RGBE bad file format: %s\n", msg);
       else
           fprintf(stderr,"RGBE bad file format: %s\n",msg);
     break;
   default:
   case rgbe_memory_error:
       if (errbuf)
-          sprintf(errbuf,"RGBE error: %s\n",msg);
+          sprintf_s(errbuf, sizeof("RGBE error: %s\n") + 1, "RGBE error: %s\n", msg);
       else
           fprintf(stderr,"RGBE error: %s\n",msg);
   }
@@ -201,11 +197,11 @@ int RGBE_ReadHeader(FILE *fp, int *width, int *height, rgbe_header_info *info,
         found_FORMAT_line = true;
         /* LG says no:    break;       // format found so break out of loop */
     }
-    else if (info && (sscanf(buf,"GAMMA=%g",&tempf) == 1)) {
+    else if (info && (sscanf_s(buf,"GAMMA=%g",&tempf) == 1)) {
       info->gamma = tempf;
       info->valid |= RGBE_VALID_GAMMA;
     }
-    else if (info && (sscanf(buf,"EXPOSURE=%g",&tempf) == 1)) {
+    else if (info && (sscanf_s(buf,"EXPOSURE=%g",&tempf) == 1)) {
       info->exposure = tempf;
       info->valid |= RGBE_VALID_EXPOSURE;
     }
@@ -220,42 +216,42 @@ int RGBE_ReadHeader(FILE *fp, int *width, int *height, rgbe_header_info *info,
   if (fgets(buf,sizeof(buf)/sizeof(buf[0]),fp) == 0)
     return rgbe_error(rgbe_read_error,NULL, errbuf);
 
-  if (sscanf(buf,"-Y %d +X %d",height,width) == 2) {
+  if (sscanf_s(buf,"-Y %d +X %d",height,width) == 2) {
       if (info) {
           info->orientation = 1;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"-Y %d -X %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"-Y %d -X %d",height,width) == 2) {
       if (info) {
           info->orientation = 2;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"+Y %d -X %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"+Y %d -X %d",height,width) == 2) {
       if (info) {
           info->orientation = 3;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"+Y %d +X %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"+Y %d +X %d",height,width) == 2) {
       if (info) {
           info->orientation = 4;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"+X %d -Y %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"+X %d -Y %d",height,width) == 2) {
       if (info) {
           info->orientation = 5;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"+X %d +Y %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"+X %d +Y %d",height,width) == 2) {
       if (info) {
           info->orientation = 6;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"-X %d +Y %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"-X %d +Y %d",height,width) == 2) {
       if (info) {
           info->orientation = 7;
           info->valid |= RGBE_VALID_ORIENTATION;
       }
-  } else if (sscanf(buf,"-X %d -Y %d",height,width) == 2) {
+  } else if (sscanf_s(buf,"-X %d -Y %d",height,width) == 2) {
       if (info) {
           info->orientation = 8;
           info->valid |= RGBE_VALID_ORIENTATION;

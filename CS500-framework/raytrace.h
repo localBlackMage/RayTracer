@@ -4,29 +4,6 @@
 
 class Shape;
 
-const float PI = 3.14159f;
-
-////////////////////////////////////////////////////////////////////////
-// Material: encapsulates a BRDF and communication with a shader.
-////////////////////////////////////////////////////////////////////////
-class Material
-{
- public:
-    Vector3f Kd, Ks;
-    float alpha;
-    unsigned int texid;
-
-    virtual bool isLight() { return false; }
-
-    Material()  : Kd(Vector3f(1.0, 0.5, 0.0)), Ks(Vector3f(1,1,1)), alpha(1.0), texid(0) {}
-    Material(const Vector3f d, const Vector3f s, const float a) 
-        : Kd(d), Ks(s), alpha(a), texid(0) {}
-    Material(Material& o) { Kd=o.Kd;  Ks=o.Ks;  alpha=o.alpha;  texid=o.texid; }
-
-    void setTexture(const std::string path);
-    //virtual void apply(const unsigned int program);
-};
-
 ////////////////////////////////////////////////////////////////////////
 // Data structures for storing meshes -- mostly used for model files
 // read in via ASSIMP.
@@ -75,8 +52,9 @@ class Realtime;
 class Scene {
 public:
     int width, height;
-    Realtime* realtime;         // Remove this (realtime stuff)
+    //Realtime* realtime;         // Remove this (realtime stuff)
     Material* currentMat;
+    ShapeList* m_pWorld;
 
     Scene();
     void Finit();

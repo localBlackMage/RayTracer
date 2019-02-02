@@ -704,7 +704,7 @@ template<typename T> void swap(scoped_array<T> &a,scoped_array<T> &b)
 * std::map< int, Matrix4f, std::less<int>, 
 *           aligned_allocator<std::pair<const int, Matrix4f> > > my_map_mat4;
 * // Vector3f does not require 16 bytes alignment, no need to use Eigen's allocator:
-* std::map< int, Vector3f > my_map_vec3;
+* std::map< int, Vector3f > my_map_Vector3f;
 * \endcode
 *
 * \sa \blank \ref TopicStlContainers.

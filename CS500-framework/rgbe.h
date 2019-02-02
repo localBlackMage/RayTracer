@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _H_RGBE
 #define _H_RGBE
 /* THIS CODE CARRIES NO GUARANTEE OF USABILITY OR FITNESS FOR ANY PURPOSE.
@@ -8,7 +10,7 @@
    See rgbe.txt file for more details.
 */
 
-#include <stdio.h>
+//#include <stdio.h>
 
 typedef struct {
   int valid;            /* indicate which fields are valid */

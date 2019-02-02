@@ -1,5 +1,4 @@
-#include <iostream>
-#include "geom.h"
+#include "stdafx.h"
 
 Quaternionf angleAxis(const float& angle, const Vector3f& axis)
 { return Quaternionf(AngleAxisf(angle, axis)); }
@@ -24,13 +23,13 @@ Matrix4f frustum(float const& left,    float const& right,
                  float const& nearVal, float const& farVal)
 {
     Matrix4f R = Matrix4f::Zero();
-    R(0,0) = (2.0*nearVal)         / (right-left);
-    R(1,1) = (2.0*nearVal)         / (top-bottom);
+    R(0,0) = (2.f*nearVal)         / (right-left);
+    R(1,1) = (2.f*nearVal)         / (top-bottom);
     R(0,2) = (right+left)          / (right-left);
     R(1,2) = (top+bottom)          / (top-bottom);
     R(2,2) = -(farVal+nearVal)     / (farVal-nearVal);
-    R(3,2) = -1.0;
-    R(2,3) = -(2.0*farVal*nearVal) / (farVal-nearVal);
+    R(3,2) = -1.f;
+    R(2,3) = -(2.f*farVal*nearVal) / (farVal-nearVal);
 
     return R;
 }

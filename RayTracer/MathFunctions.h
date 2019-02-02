@@ -38,13 +38,9 @@ int RandomInt(int min, int max);
 Vec3 Reflect(const Vec3& a_vA, const Vec3& a_vB);
 
 bool AreSameSign(const float& a_fA, const float& a_fB);
+
 template <typename T>
-void SwapValues(T& a_A, T& a_B);
-
-#endif
-
-template<typename T>
-inline void SwapValues(T & a_A, T & a_B)
+void SwapValues(T& a_A, T& a_B)
 {
     T tmp = a_A;
     a_A = a_B;
@@ -52,3 +48,5 @@ inline void SwapValues(T & a_A, T & a_B)
 }
 
 float GetDValueForPlane(const Vec3& a_vNormal, const Vec3& a_vPoint);
+
+#endif

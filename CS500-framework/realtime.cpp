@@ -3,11 +3,7 @@
 // the contents of a scene file in realtime in a GLUT window.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <string>
-#include <fstream>
-#include <vector>
-
-#include "geom.h"
+#include "stdafx.h"
 #include "raytrace.h"
 #include "realtime.h"
 
@@ -162,7 +158,7 @@ void ShaderProgram::CreateShader(const std::string fname, const GLenum type)
     std::ifstream f;
     f.open(fname, std::ios_base::binary); // Open
     f.seekg(0, std::ios_base::end);       // Position at end
-    int length = f.tellg();               // to get the length
+    int length = int(f.tellg());               // to get the length
     
     char* src = new char [length+1];  // Create buffer of needed length
     f.seekg (0, std::ios_base::beg);      // Position at beginning
@@ -356,13 +352,13 @@ void Realtime::DrawScene()
     Vector3f viewDir = ViewDirection();
     Vector2f dir2 = Vector2f(viewDir.x(), viewDir.y()).normalized();
     if (motionkey == 'w')
-        eye += speed*Vector3f(dir2.x(), dir2.y(), 0.0);
+        eye += speed*Vector3f(dir2.x(), dir2.y(), 0.f);
     if (motionkey == 's')
-        eye -= speed*Vector3f(dir2.x(), dir2.y(), 0.0);
+        eye -= speed*Vector3f(dir2.x(), dir2.y(), 0.f);
     if (motionkey == 'd')
-        eye += speed*Vector3f(dir2.y(), -dir2.x(), 0.0);
+        eye += speed*Vector3f(dir2.y(), -dir2.x(), 0.f);
     if (motionkey == 'a')
-        eye -= speed*Vector3f(dir2.y(), -dir2.x(), 0.0);
+        eye -= speed*Vector3f(dir2.y(), -dir2.x(), 0.f);
     if (motionkey == 'e')
         eye -= speed*Vector3f(0.0f, 0.0f, -1.0f);
     if (motionkey == 'c')
@@ -370,7 +366,7 @@ void Realtime::DrawScene()
     
     int loc;
 
-    glClearColor(0.3,0.3, 0.3, 1.0);
+    glClearColor(0.3f, 0.3f, 0.3f, 1.f);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);

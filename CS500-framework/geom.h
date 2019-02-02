@@ -1,4 +1,9 @@
 
+#pragma once
+
+#ifndef GEOM_H
+#define GEOM_H
+
 #include <string>
 #include <iostream>
 
@@ -34,3 +39,5 @@ template <typename T> void Print(const std::string& s, const T& m)
 template <> void Print(const std::string& s, const float& f);
 template <> void Print(const std::string& s, const double& f);
 template <> void Print(const std::string& s, const Quaternionf& f);
+
+#endif

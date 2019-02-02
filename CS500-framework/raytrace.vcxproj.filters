@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="geom.cpp" />
+    <ClCompile Include="raytrace.cpp" />
+    <ClCompile Include="readAssimpFile.cpp" />
+    <ClCompile Include="realtime.cpp" />
+    <ClCompile Include="rgbe.cpp" />
+    <ClCompile Include="BoundingBox.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Cyllinder.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Slab.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Shape.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="ShapeList.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>RayTracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>RayTracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Interval.cpp">
+      <Filter>RayTracing</Filter>
+    </ClCompile>
+    <ClCompile Include="MathFunctions.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="realtime.h" />
+    <ClInclude Include="geom.h" />
+    <ClInclude Include="BoundingBox.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Cyllinder.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Slab.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Shape.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeList.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Interval.h">
+      <Filter>RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="MathFunctions.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="MathDefines.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="NiceTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{512bb744-1a5c-46de-aeea-75f6390ea10a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shapes">
+      <UniqueIdentifier>{5ed676e0-572f-403f-ae44-57624b23ccc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayTracing">
+      <UniqueIdentifier>{26e05531-eb48-4c1c-a26d-2893084f60d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{9c55c229-eab4-49a9-a2ef-1d27a118fdca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

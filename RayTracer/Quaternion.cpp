@@ -343,7 +343,7 @@ Quaternion Quaternion::FromTwoVectors(const Vec3 & a_vA, const Vec3 & a_vB)
     //    under the constraint:
     //       ||x|| = 1
     //    which yields a singular value problem
-    if (c < -1.f + FLOAT_EPSILON)
+    /*if (c < -1.f + FLOAT_EPSILON)
     {
         c = numext::maxi(c, -1));
         Matrix<Scalar, 2, 3> m; m << v0.transpose(), v1.transpose();
@@ -361,7 +361,8 @@ Quaternion Quaternion::FromTwoVectors(const Vec3 & a_vA, const Vec3 & a_vB)
     this->vec() = axis * invs;
     this->w = s * 0.5f;
 
-    return derived();
+    return derived();*/
+    return Quaternion();
 }
 
 #pragma endregion

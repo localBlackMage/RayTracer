@@ -2,34 +2,23 @@
 // Provides the framework for a raytracer.
 ////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-
-#ifdef _WIN32
-    // Includes for Windows
-    #include <windows.h>
-    #include <cstdlib>
-    #include <limits>
-    #include <crtdbg.h>
-#else
-    // Includes for Linux
-#endif
-
-#include "geom.h"
+#include "stdafx.h"
 #include "raytrace.h"
 #include "realtime.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-// A good quality *thread-safe* Mersenne Twister random number generator.
-#include <random>
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "stb_image.h"
+//
+//// A good quality *thread-safe* Mersenne Twister random number generator.
+//#include <random>
 std::mt19937_64 RNGen;
 std::uniform_real_distribution<> myrandom(0.0, 1.0);
 // Call myrandom(RNGen) to get a uniformly distributed random number in [0,1].
 
-Scene::Scene() 
+Scene::Scene() :
+    m_pWorld(nullptr)
 { 
-    realtime = new Realtime(); 
+    //realtime = new Realtime(); 
 }
 
 void Scene::Finit()
@@ -38,7 +27,7 @@ void Scene::Finit()
 
 void Scene::triangleMesh(MeshData* mesh) 
 { 
-    realtime->triangleMesh(mesh); 
+    //realtime->triangleMesh(mesh); 
 }
 
 Quaternionf Orientation(int i, 
@@ -46,7 +35,7 @@ Quaternionf Orientation(int i,
                         const std::vector<float>& f)
 {
     Quaternionf q(1,0,0,0); // Unit quaternion
-    while (i<strings.size()) {
+    while (i < int(strings.size())) {
         std::string c = strings[i++];
         if (c == "x")  
             q *= angleAxis(f[i++]*Radians, Vector3f::UnitX());
@@ -63,29 +52,6 @@ Quaternionf Orientation(int i,
     return q;
 }
 
-////////////////////////////////////////////////////////////////////////
-// Material: encapsulates surface properties
-void Material::setTexture(const std::string path)
-{
-    int width, height, n;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* image = stbi_load(path.c_str(), &width, &height, &n, 0);
-
-    // Realtime code below:  This sends the texture in *image to the graphics card.
-    // The raytracer will not use this code (nor any features of OpenGL nor the graphics card).
-    glGenTextures(1, &texid);
-    glBindTexture(GL_TEXTURE_2D, texid);
-    glTexImage2D(GL_TEXTURE_2D, 0, n, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 100);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (int)GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (int)GL_LINEAR_MIPMAP_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    stbi_image_free(image);
-}
-
 void Scene::Command(const std::vector<std::string>& strings,
                     const std::vector<float>& f)
 {
@@ -94,21 +60,24 @@ void Scene::Command(const std::vector<std::string>& strings,
     
     if (c == "screen") {
         // syntax: screen width height
-        realtime->setScreen(int(f[1]),int(f[2]));
+        //realtime->setScreen(int(f[1]),int(f[2]));
         width = int(f[1]);
-        height = int(f[2]); }
+        height = int(f[2]); 
+    }
 
     else if (c == "camera") {
         // syntax: camera x y z   ry   <orientation spec>
         // Eye position (x,y,z),  view orientation (qw qx qy qz),  frustum height ratio ry
-        realtime->setCamera(Vector3f(f[1],f[2],f[3]), Orientation(5,strings,f), f[4]); }
+        //realtime->setCamera(Vector3f(f[1],f[2],f[3]), Orientation(5,strings,f), f[4]);
+    }
 
     else if (c == "ambient") {
         // syntax: ambient r g b
         // Sets the ambient color.  Note: This parameter is temporary.
         // It will be ignored once your raytracer becomes capable of
         // accurately *calculating* the true ambient light.
-        realtime->setAmbient(Vector3f(f[1], f[2], f[3])); }
+        //realtime->setAmbient(Vector3f(f[1], f[2], f[3])); 
+    }
 
     else if (c == "brdf")  {
         // syntax: brdf  r g b   r g b  alpha
@@ -116,28 +85,33 @@ void Scene::Command(const std::vector<std::string>& strings,
         // First rgb is Diffuse reflection, second is specular reflection.
         // third is beer's law transmission followed by index of refraction.
         // Creates a Material instance to be picked up by successive shapes
-        currentMat = new Material(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), f[7]); }
+        currentMat = new Material(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), f[7]); 
+    }
 
     else if (c == "light") {
         // syntax: light  r g b   
         // The rgb is the emission of the light
         // Creates a Material instance to be picked up by successive shapes
-        currentMat = new Light(Vector3f(f[1], f[2], f[3])); }
+        currentMat = new Light(Vector3f(f[1], f[2], f[3])); 
+    }
    
     else if (c == "sphere") {
         // syntax: sphere x y z   r
         // Creates a Shape instance for a sphere defined by a center and radius
-        realtime->sphere(Vector3f(f[1], f[2], f[3]), f[4], currentMat); }
+        //realtime->sphere(Vector3f(f[1], f[2], f[3]), f[4], currentMat); 
+    }
 
     else if (c == "box") {
         // syntax: box bx by bz   dx dy dz
         // Creates a Shape instance for a box defined by a corner point and diagonal vector
-        realtime->box(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), currentMat); }
+        //realtime->box(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), currentMat); 
+    }
 
     else if (c == "cylinder") {
         // syntax: cylinder bx by bz   ax ay az  r
         // Creates a Shape instance for a cylinder defined by a base point, axis vector, and radius
-        realtime->cylinder(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), f[7], currentMat); }
+        //realtime->cylinder(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), f[7], currentMat); 
+    }
 
 
     else if (c == "mesh") {
@@ -161,7 +135,7 @@ void Scene::Command(const std::vector<std::string>& strings,
 
 void Scene::TraceImage(Color* image, const int pass)
 {
-    realtime->run();                          // Remove this (realtime stuff)
+    //realtime->run();                          // Remove this (realtime stuff)
 
 #pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
     for (int y=0;  y<height;  y++) {
@@ -170,7 +144,7 @@ void Scene::TraceImage(Color* image, const int pass)
         for (int x=0;  x<width;  x++) {
             Color color;
             if ((x-width/2)*(x-width/2)+(y-height/2)*(y-height/2) < 100*100)
-                color = Color(myrandom(RNGen), myrandom(RNGen), myrandom(RNGen));
+                color = Color(float(myrandom(RNGen)), float(myrandom(RNGen)), float(myrandom(RNGen)));
             else if (abs(x-width/2)<4 || abs(y-height/2)<4)
                 color = Color(0.0, 0.0, 0.0);
             else 
