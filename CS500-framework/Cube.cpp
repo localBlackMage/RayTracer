@@ -104,7 +104,7 @@ bool Cube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a
 
 
 
-AABCube::AABCube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material * a_pMaterial) :
+AACube::AACube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material * a_pMaterial) :
     Cube(a_pMaterial),
     m_vCorner(a_vCorner),
     m_vDiagonal(a_vDiagonal)
@@ -128,11 +128,11 @@ AABCube::AABCube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material * a_pMateria
     };
 }
 
-AABCube::~AABCube()
+AACube::~AACube()
 {
 }
 
-bool AABCube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a_Hit) const
+bool AACube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a_Hit) const
 {
     return Cube::Hit(a_Ray, a_fTMin, a_fTMax, a_Hit);
 }

@@ -7,15 +7,8 @@ class Cube :
     public Shape
 {
 protected:
-    struct CubeSlab {
-        float m_fD0;
-        float m_fD1;
-        Vector3f m_vNormal;
-    };
-
     Vector3f m_vCenter;
-    //Slab* m_pSlabA, *m_pSlabB, *m_pSlabC;
-    CubeSlab m_Slabs[3];
+    RTSlab m_Slabs[3];
 
 public:
     Cube(Material* a_pMaterial) : Shape(a_pMaterial) {}
@@ -25,14 +18,14 @@ public:
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
 };
 
-class AABCube : public Cube
+class AACube : public Cube
 {
 protected:
     Vector3f m_vCorner, m_vDiagonal;
 
 public:
-    AABCube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material* a_pMaterial);
-    virtual ~AABCube();
+    AACube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material* a_pMaterial);
+    virtual ~AACube();
 
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
 };

@@ -19,4 +19,10 @@ public:
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
 };
 
+struct RTSlab {
+    float m_fD0;
+    float m_fD1;
+    Vector3f m_vNormal;
+};
+
 #endif //SLAB_H

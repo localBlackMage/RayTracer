@@ -6,9 +6,6 @@
 #include "raytrace.h"
 #include "realtime.h"
 
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "stb_image.h"
-//
 //// A good quality *thread-safe* Mersenne Twister random number generator.
 //#include <random>
 std::mt19937_64 RNGen;
@@ -16,9 +13,9 @@ std::uniform_real_distribution<> myrandom(0.0, 1.0);
 // Call myrandom(RNGen) to get a uniformly distributed random number in [0,1].
 
 Scene::Scene() :
-    m_pWorld(nullptr)
+    m_pRayTracer(new RayTracer()),
+    currentMat(nullptr)
 { 
-    //realtime = new Realtime(); 
 }
 
 void Scene::Finit()
@@ -27,7 +24,7 @@ void Scene::Finit()
 
 void Scene::triangleMesh(MeshData* mesh) 
 { 
-    //realtime->triangleMesh(mesh); 
+    m_pRayTracer->AddTriangleMesh(mesh);
 }
 
 Quaternionf Orientation(int i, 
@@ -69,6 +66,7 @@ void Scene::Command(const std::vector<std::string>& strings,
         // syntax: camera x y z   ry   <orientation spec>
         // Eye position (x,y,z),  view orientation (qw qx qy qz),  frustum height ratio ry
         //realtime->setCamera(Vector3f(f[1],f[2],f[3]), Orientation(5,strings,f), f[4]);
+        m_pRayTracer->SetCamera(Vector3f(f[1], f[2], f[3]), Orientation(5, strings, f), f[4]);
     }
 
     else if (c == "ambient") {
@@ -98,21 +96,20 @@ void Scene::Command(const std::vector<std::string>& strings,
     else if (c == "sphere") {
         // syntax: sphere x y z   r
         // Creates a Shape instance for a sphere defined by a center and radius
-        //realtime->sphere(Vector3f(f[1], f[2], f[3]), f[4], currentMat); 
+        m_pRayTracer->AddSphere(Vector3f(f[1], f[2], f[3]), f[4], currentMat);
     }
 
     else if (c == "box") {
         // syntax: box bx by bz   dx dy dz
         // Creates a Shape instance for a box defined by a corner point and diagonal vector
-        //realtime->box(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), currentMat); 
+        m_pRayTracer->AddBox(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), currentMat);
     }
 
     else if (c == "cylinder") {
         // syntax: cylinder bx by bz   ax ay az  r
         // Creates a Shape instance for a cylinder defined by a base point, axis vector, and radius
-        //realtime->cylinder(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), f[7], currentMat); 
+        m_pRayTracer->AddCylinder(Vector3f(f[1], f[2], f[3]), Vector3f(f[4], f[5], f[6]), f[7], currentMat);
     }
-
 
     else if (c == "mesh") {
         // syntax: mesh   filename   tx ty tz   s   <orientation>
@@ -123,7 +120,8 @@ void Scene::Command(const std::vector<std::string>& strings,
         Matrix4f modelTr = translate(Vector3f(f[2],f[3],f[4]))
                           *scale(Vector3f(f[5],f[5],f[5]))
                           *toMat4(Orientation(6,strings,f));
-        ReadAssimpFile(strings[1], modelTr);  }
+        ReadAssimpFile(strings[1], modelTr);  
+    }
 
     
     else {
@@ -135,20 +133,18 @@ void Scene::Command(const std::vector<std::string>& strings,
 
 void Scene::TraceImage(Color* image, const int pass)
 {
-    //realtime->run();                          // Remove this (realtime stuff)
-
 #pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
-    for (int y=0;  y<height;  y++) {
+    for (int y = 0; y < height; y++) {
 
         fprintf(stderr, "Rendering %4d\r", y);
-        for (int x=0;  x<width;  x++) {
-            Color color;
-            if ((x-width/2)*(x-width/2)+(y-height/2)*(y-height/2) < 100*100)
-                color = Color(float(myrandom(RNGen)), float(myrandom(RNGen)), float(myrandom(RNGen)));
-            else if (abs(x-width/2)<4 || abs(y-height/2)<4)
-                color = Color(0.0, 0.0, 0.0);
-            else 
-                color = Color(1.0, 1.0, 1.0);
+        for (int x = 0; x < width; x++) {
+            Color color = m_pRayTracer->GetColor(x, y);
+            //if ((x - width / 2)*(x - width / 2) + (y - height / 2)*(y - height / 2) < 100 * 100)
+            //    color = Color(float(myrandom(RNGen)), float(myrandom(RNGen)), float(myrandom(RNGen)));
+            //else if (abs(x - width / 2) < 4 || abs(y - height / 2) < 4)
+            //    color = Color(0.0, 0.0, 0.0);
+            //else
+            //    color = Color(1.0, 1.0, 1.0);
             image[y*width + x] = color;
         }
     }

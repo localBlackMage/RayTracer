@@ -99,9 +99,13 @@ void recurseModelNodes(Scene* scene,
             for (i=2;  i<aiface->mNumIndices;  i++) {
                 meshdata->triangles.push_back(TriData(aiface->mIndices[0],
                                                       aiface->mIndices[1],
-                                                      aiface->mIndices[2])); } }
+                                                      aiface->mIndices[2])); 
+            } 
+        }
+
         meshdata->mat = material;
-        scene->triangleMesh(meshdata); }
+        scene->triangleMesh(meshdata); 
+    }
 
     printf("\n");
 

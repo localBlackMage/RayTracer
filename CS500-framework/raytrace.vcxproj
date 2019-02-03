@@ -109,7 +109,7 @@
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
-    <ClCompile Include="Cyllinder.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Interval.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="geom.cpp" />
@@ -117,6 +117,7 @@
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="raytrace.cpp" />
+    <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="readAssimpFile.cpp" />
     <ClCompile Include="realtime.cpp" />
     <ClCompile Include="rgbe.cpp" />
@@ -132,13 +133,14 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
-    <ClInclude Include="Cyllinder.h" />
+    <ClInclude Include="Cylinder.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MathDefines.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="NiceTypes.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="RayTracer.h" />
     <ClInclude Include="realtime.h" />
     <ClInclude Include="geom.h" />
     <ClInclude Include="Shape.h" />

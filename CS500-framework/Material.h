@@ -42,4 +42,16 @@ public:
     bool Scatter(const Ray& a_RayIn, const Intersection& a_HitData, Vector3f& a_vAttentuation, Ray& a_RayOut) const;
 };
 
+////////////////////////////////////////////////////////////////////////
+// Light: encapsulates a light and communiction with a shader.
+////////////////////////////////////////////////////////////////////////
+class Light : public Material
+{
+public:
+
+    Light(const Vector3f e) : Material() { Kd = e; }
+    virtual bool isLight() { return true; }
+    //virtual void apply(const unsigned int program);
+};
+
 #endif //MATERIAL_H

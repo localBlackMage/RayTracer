@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="geom.cpp" />
-    <ClCompile Include="raytrace.cpp" />
     <ClCompile Include="readAssimpFile.cpp" />
     <ClCompile Include="realtime.cpp" />
     <ClCompile Include="rgbe.cpp" />
@@ -11,9 +10,6 @@
       <Filter>Shapes</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
-      <Filter>Shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="Cyllinder.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
     <ClCompile Include="Triangle.cpp">
@@ -47,6 +43,15 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="raytrace.cpp">
+      <Filter>RayTracing</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracer.cpp">
+      <Filter>RayTracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Cylinder.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="realtime.h" />
@@ -55,9 +60,6 @@
       <Filter>Shapes</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>Shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="Cyllinder.h">
       <Filter>Shapes</Filter>
     </ClInclude>
     <ClInclude Include="Triangle.h">
@@ -95,6 +97,12 @@
     </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="NiceTypes.h" />
+    <ClInclude Include="RayTracer.h">
+      <Filter>RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Cylinder.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

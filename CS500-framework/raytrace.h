@@ -33,28 +33,17 @@ struct MeshData
     Material *mat;
 };
 
-////////////////////////////////////////////////////////////////////////
-// Light: encapsulates a light and communiction with a shader.
-////////////////////////////////////////////////////////////////////////
-class Light: public Material
-{
-public:
-
-    Light(const Vector3f e) : Material() { Kd = e; }
-    virtual bool isLight() { return true; }
-    //virtual void apply(const unsigned int program);
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 // Scene
-class Realtime;
+//class Realtime;
+class RayTracer;
 
 class Scene {
 public:
     int width, height;
     //Realtime* realtime;         // Remove this (realtime stuff)
+    RayTracer* m_pRayTracer;
     Material* currentMat;
-    ShapeList* m_pWorld;
 
     Scene();
     void Finit();

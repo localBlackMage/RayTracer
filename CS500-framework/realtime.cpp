@@ -572,7 +572,7 @@ void Realtime::cylinder(const Vector3f base, const Vector3f axis, const float ra
     Vector3f Z(0.0f, 0.0f, 1.0f);
     Vector3f C = axis.normalized();
     Vector3f B = C.cross(Z);
-    if (B.norm() <1e-8)
+    if (B.norm() < 1e-8)
         B = Vector3f(0,1,0);
     else
         B = B.normalized();

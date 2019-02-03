@@ -99,7 +99,6 @@ int main(int argc, char** argv)
 {
     Scene* scene = new Scene();
 
-    Quaternionf::FromTwoVectors(Vector3f(), Vector3f());
     // Read the command line argument
     std::string inName =  (argc > 1) ? argv[1] : "testscene.scn";
     std::string hdrName = inName;

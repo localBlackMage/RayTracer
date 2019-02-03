@@ -59,7 +59,7 @@ using namespace gl;
 #include "Sphere.h"
 #include "Slab.h"
 #include "Cube.h"
-#include "Cyllinder.h"
+#include "Cylinder.h"
 #include "Triangle.h"
 
 #include "ShapeList.h"
@@ -67,3 +67,5 @@ using namespace gl;
 #include "Material.h"
 
 #include "Camera.h"
+
+#include "RayTracer.h"
