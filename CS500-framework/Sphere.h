@@ -10,6 +10,8 @@ protected:
     Vector3f m_vCenter;
     float m_fRadius;
 
+    virtual void CreateBoundingBox();
+
 public:
     Sphere(Vector3f a_vCenter, float a_fRadius, Material* a_pMaterial);
     virtual ~Sphere();

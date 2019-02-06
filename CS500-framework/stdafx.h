@@ -45,15 +45,18 @@ using namespace gl;
 
 #include "rgbe.h"
 #include "geom.h"
+#include <Eigen/StdVector>
+#include <Eigen_unsupported/Eigen/BVH>
 
 #include "NiceTypes.h"
 #include "MathDefines.h"
 #include "MathFunctions.h"
 
-#include "Interval.h"
-#include "BoundingBox.h"
-
 #include "Ray.h"
+#include "Interval.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "BoundingBox.h"
 
 #include "Shape.h"
 #include "Sphere.h"
@@ -62,10 +65,7 @@ using namespace gl;
 #include "Cylinder.h"
 #include "Triangle.h"
 
+#include "Minimizer.h"
 #include "ShapeList.h"
-
-#include "Material.h"
-
 #include "Camera.h"
-
 #include "RayTracer.h"

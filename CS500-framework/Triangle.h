@@ -7,12 +7,13 @@ class Triangle :
     public Shape
 {
 protected:
-    Vector3f m_vA, m_vB, m_vC;
-    Vector3f m_vNormalA, m_vNormalB, m_vNormalC;
+    VertexData m_vdA, m_vdB, m_vdC;
     Vector3f m_vEdge0, m_vEdge1;
 
+    void CreateBoundingBox();
+
 public:
-    Triangle(Vector3f a_vA, Vector3f a_vB, Vector3f a_vC, Vector3f a_vNormalA, Vector3f a_vNormalB, Vector3f a_vNormalC, Material* a_pMaterial);
+    Triangle(const VertexData& a_vdA, const VertexData& a_vdB, const VertexData& a_vdC, Material* a_pMaterial);
     virtual ~Triangle();
 
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;

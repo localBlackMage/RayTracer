@@ -20,11 +20,13 @@ Scene::Scene() :
 
 void Scene::Finit()
 {
+    m_pRayTracer->Finish();
 }
 
 void Scene::triangleMesh(MeshData* mesh) 
 { 
-    m_pRayTracer->AddTriangleMesh(mesh);
+    fprintf(stderr, "\nAdding Tri Mesh: Num Tris - %d\n", uint32(mesh->triangles.size()));
+    m_pRayTracer->AddTriangleMesh(mesh, currentMat);
 }
 
 Quaternionf Orientation(int i, 
@@ -59,7 +61,8 @@ void Scene::Command(const std::vector<std::string>& strings,
         // syntax: screen width height
         //realtime->setScreen(int(f[1]),int(f[2]));
         width = int(f[1]);
-        height = int(f[2]); 
+        height = int(f[2]);
+        m_pRayTracer->SetScreenDimensions(uint32(width), uint32(height));
     }
 
     else if (c == "camera") {
@@ -120,7 +123,7 @@ void Scene::Command(const std::vector<std::string>& strings,
         Matrix4f modelTr = translate(Vector3f(f[2],f[3],f[4]))
                           *scale(Vector3f(f[5],f[5],f[5]))
                           *toMat4(Orientation(6,strings,f));
-        ReadAssimpFile(strings[1], modelTr);  
+        ReadAssimpFile(strings[1], modelTr);
     }
 
     
@@ -133,19 +136,12 @@ void Scene::Command(const std::vector<std::string>& strings,
 
 void Scene::TraceImage(Color* image, const int pass)
 {
-#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
+    fprintf(stderr, "\nNumObjects %d\n", m_pRayTracer->NumShapes());
+//#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
     for (int y = 0; y < height; y++) {
-
         fprintf(stderr, "Rendering %4d\r", y);
         for (int x = 0; x < width; x++) {
-            Color color = m_pRayTracer->GetColor(x, y);
-            //if ((x - width / 2)*(x - width / 2) + (y - height / 2)*(y - height / 2) < 100 * 100)
-            //    color = Color(float(myrandom(RNGen)), float(myrandom(RNGen)), float(myrandom(RNGen)));
-            //else if (abs(x - width / 2) < 4 || abs(y - height / 2) < 4)
-            //    color = Color(0.0, 0.0, 0.0);
-            //else
-            //    color = Color(1.0, 1.0, 1.0);
-            image[y*width + x] = color;
+            image[y*width + x] = m_pRayTracer->GetColor(x, y);
         }
     }
     fprintf(stderr, "\n");

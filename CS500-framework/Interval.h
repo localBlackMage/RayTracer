@@ -15,13 +15,20 @@ void SetMinMaxInterval(Interval& a_IntToSet, const Interval& a_OtherInt);
 
 struct Intersection
 {
-    float m_fT;
+    float m_fT = INF, m_fMin = 0.0001f, m_fMax = INF;
     Vector3f m_vPoint;
     Vector3f m_vNormal;
-    Material* m_pMaterial;
+    Material* m_pMaterial = nullptr;
     Interval m_Interval;
 };
 
-bool SetIntersectionFromLowestPositive(Intersection& a_Intersection, const Interval& a_Interval);
+struct LowestPostiveIntersection
+{
+    bool m_bDidIntersect = false;
+    float m_fT;
+    Vector3f m_vNormal;
+};
+
+LowestPostiveIntersection FindLowestPositive(float a_fTMin, float a_fTMax, const Interval& a_Interval);
 
 #endif

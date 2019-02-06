@@ -13,7 +13,7 @@ protected:
     Camera* m_pCamera;
     ShapeList* m_pWorld;
     ShapeList* m_pLights;
-    uint32 m_uScreenX, m_uScreenY;
+    uint32 m_uScreenWidth, m_uScreenHeight;
     float m_fNumRaysPerPixel = 10.f;
 
     Color PathTrace(const Ray& a_Ray, int a_iDepth);
@@ -21,14 +21,17 @@ public:
     RayTracer();
     ~RayTracer();
 
+    void SetScreenDimensions(uint32 a_uWidth, uint32 a_uHeight);
     void SetCamera(const Vector3f& a_vEye, const Quaternionf& a_qOrientation, float a_fRY);
     void SetAmbient() {};
     void AddSphere(const Vector3f& center, float r, Material* mat);
     void AddBox(const Vector3f& base, const Vector3f& diag, Material* mat);
     void AddCylinder(const Vector3f& base, const Vector3f& axis, float radius, Material* mat);
-    void AddTriangleMesh(MeshData* mesh);
+    void AddTriangleMesh(MeshData* mesh, Material * mat);
+    uint32 NumShapes() const { return m_pWorld->NumShapes(); }
+    void Finish();
 
-    Color GetColor(int i, int j);
+    Color GetColor(uint32 i, uint32 j);
 };
 
 #endif //RAY_TRACER_H

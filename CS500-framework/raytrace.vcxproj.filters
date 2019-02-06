@@ -18,9 +18,6 @@
     <ClCompile Include="Sphere.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
-    <ClCompile Include="Slab.cpp">
-      <Filter>Shapes</Filter>
-    </ClCompile>
     <ClCompile Include="Shape.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
@@ -52,6 +49,10 @@
     <ClCompile Include="Cylinder.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="Slab.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Minimizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="realtime.h" />
@@ -103,6 +104,8 @@
     <ClInclude Include="Cylinder.h">
       <Filter>Shapes</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Minimizer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

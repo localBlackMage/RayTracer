@@ -1,12 +1,17 @@
 #include "stdafx.h"
 
+void Sphere::CreateBoundingBox()
+{
+    Vector3f diag = Vector3f(m_fRadius, m_fRadius, m_fRadius);
+    m_BoundingBox = Bbox(m_vCenter - diag, m_vCenter + diag);
+}
+
 Sphere::Sphere(Vector3f a_vCenter, float a_fRadius, Material* a_pMaterial) :
     Shape(a_pMaterial),
     m_vCenter(a_vCenter),
     m_fRadius(a_fRadius)
 {
-    float diameter = 2.f * m_fRadius;
-    m_pBoundingBox = new BoundingBox(this, m_vCenter, diameter, diameter, diameter);
+    CreateBoundingBox();
 }
 
 Sphere::~Sphere()

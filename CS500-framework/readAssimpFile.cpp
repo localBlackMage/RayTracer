@@ -40,7 +40,7 @@ void recurseModelNodes(Scene* scene,
 {
     // Print line with indentation to show structure of the model node hierarchy.
     for (int i=0;  i<level;  i++) printf("| ");
-    printf("%s ", node->mName.data);
+    printf("%s :: Num Meshes %d", node->mName.data, node->mNumMeshes);
 
     // Accumulating transformations while traversing down the hierarchy.
     aiMatrix4x4 childTr = parentTr*node->mTransformation;
@@ -49,7 +49,7 @@ void recurseModelNodes(Scene* scene,
     // Loop through this node's meshes
     for (uint32 i=0;  i<node->mNumMeshes; ++i) {
         aiMesh* aimesh = aiscene->mMeshes[node->mMeshes[i]];
-        printf("%d:%d ", aimesh->mNumVertices, aimesh->mNumFaces);
+        printf(" %d:%d ", aimesh->mNumVertices, aimesh->mNumFaces);
 
         // Extract this node's surface material.
         aiString texPath;
@@ -90,13 +90,14 @@ void recurseModelNodes(Scene* scene,
             meshdata->vertices.push_back(VertexData(Vector3f(aipnt.x, aipnt.y, aipnt.z),
                                                     Vector3f(ainrm.x, ainrm.y, ainrm.z),
                                                     Vector2f(aitex.x, aitex.y),
-                                                    Vector3f(aitan.x, aitan.y, aitan.z))); }
+                                                    Vector3f(aitan.x, aitan.y, aitan.z))); 
+        }
         
         // Loop through all faces, recording indices
         for (unsigned int t=0;  t<aimesh->mNumFaces;  ++t) {
             aiFace* aiface = &aimesh->mFaces[t];
             //printf("%d: %d %d\n", t, aiface->mNumIndices, aimesh->mNumFaces);
-            for (i=2;  i<aiface->mNumIndices;  i++) {
+            for (int ii = 2;  ii < aiface->mNumIndices;  ii++) {
                 meshdata->triangles.push_back(TriData(aiface->mIndices[0],
                                                       aiface->mIndices[1],
                                                       aiface->mIndices[2])); 

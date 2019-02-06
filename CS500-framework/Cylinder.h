@@ -14,6 +14,8 @@ protected:
     Quaternionf m_qRotation;
     RTSlab m_Slab;
 
+    virtual void CreateBoundingBox();
+
 public:
     Cylinder(const Vector3f& a_vLocation, const Vector3f& a_vAxis, float a_fRadius, Material* a_pMaterial);
     virtual ~Cylinder();

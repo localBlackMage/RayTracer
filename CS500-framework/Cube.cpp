@@ -1,41 +1,47 @@
 #include "stdafx.h"
 
+void Cube::CreateBoundingBox()
+{
+}
+
 Cube::Cube(Vector3f a_vCenter, float a_fWidth, float a_fHeight, float a_fDepth, Quaternionf a_qRotation, Material * a_pMaterial) :
     Shape(a_pMaterial),
     m_vCenter(a_vCenter)
 {
-    Vector3f d0 = Vector3f(0.5f, 0, 0);
-    Vector3f d1 = Vector3f(-0.5f, 0, 0);
-    Vector3f N = Vector3f(1, 0, 0);
-    Vector3f NPrime = a_qRotation._transformVector(N).normalized();
+    //Vector3f d0 = Vector3f(0.5f, 0, 0);
+    //Vector3f d1 = Vector3f(-0.5f, 0, 0);
+    //Vector3f N = Vector3f(1, 0, 0);
+    //Vector3f NPrime = a_qRotation._transformVector(N).normalized();
 
-    m_Slabs[0] = {
-       GetDValueForPlane(NPrime, a_qRotation._transformVector(d0)),
-       GetDValueForPlane(NPrime, a_qRotation._transformVector(d1)),
-       NPrime
-    };
+    //m_Slabs[0] = {
+    //   GetDValueForPlane(NPrime, a_qRotation._transformVector(d0)),
+    //   GetDValueForPlane(NPrime, a_qRotation._transformVector(d1)),
+    //   NPrime
+    //};
 
-    d0 = Vector3f(0, 0.5f, 0);
-    d1 = Vector3f(0, -0.5f, 0);
-    N = Vector3f(0, 1, 0);
-    NPrime = a_qRotation._transformVector(N).normalized();
+    //d0 = Vector3f(0, 0.5f, 0);
+    //d1 = Vector3f(0, -0.5f, 0);
+    //N = Vector3f(0, 1, 0);
+    //NPrime = a_qRotation._transformVector(N).normalized();
 
-    m_Slabs[1] = {
-       GetDValueForPlane(NPrime, a_qRotation._transformVector(d0)),
-       GetDValueForPlane(NPrime, a_qRotation._transformVector(d1)),
-       NPrime
-    };
+    //m_Slabs[1] = {
+    //   GetDValueForPlane(NPrime, a_qRotation._transformVector(d0)),
+    //   GetDValueForPlane(NPrime, a_qRotation._transformVector(d1)),
+    //   NPrime
+    //};
 
-    d0 = Vector3f(0, 0, 0.5f);
-    d1 = Vector3f(0, 0, -0.5f);
-    N = Vector3f(0, 0, 1);
-    NPrime = a_qRotation._transformVector(N).normalized();
+    //d0 = Vector3f(0, 0, 0.5f);
+    //d1 = Vector3f(0, 0, -0.5f);
+    //N = Vector3f(0, 0, 1);
+    //NPrime = a_qRotation._transformVector(N).normalized();
 
-    m_Slabs[2] = {
-       GetDValueForPlane(NPrime, a_qRotation._transformVector(d0)),
-       GetDValueForPlane(NPrime, a_qRotation._transformVector(d1)),
-       NPrime
-    };
+    //m_Slabs[2] = {
+    //   GetDValueForPlane(NPrime, a_qRotation._transformVector(d0)),
+    //   GetDValueForPlane(NPrime, a_qRotation._transformVector(d1)),
+    //   NPrime
+    //};
+
+    //CreateBoundingBox();
 }
 
 Cube::~Cube()
@@ -45,41 +51,12 @@ Cube::~Cube()
 
 bool Cube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a_Hit) const
 {
-    const Vector3f& D = a_Ray.Direction();
-    const Vector3f& S = a_Ray.Origin();
-    Interval interval[3];
+    Interval interval[3] = {
+        SlabIntersect(m_Slabs[0], a_Ray),
+        SlabIntersect(m_Slabs[1], a_Ray),
+        SlabIntersect(m_Slabs[2], a_Ray)
+    };
     Interval maxInterval;
-    maxInterval.m_fT0 = 0.f;
-    maxInterval.m_fT1 = FLT_MAX;
-
-    for (uint32 i = 0; i < 3; ++i)
-    {
-        interval[i].m_fT0 = 0.f;
-        interval[i].m_fT1 = FLT_MAX;
-        interval[i].m_vNormal0 = m_Slabs[i].m_vNormal;
-        interval[i].m_vNormal1 = m_Slabs[i].m_vNormal;
-
-        float nDotD = m_Slabs[i].m_vNormal.dot(D);
-        float nDotS = m_Slabs[i].m_vNormal.dot(S);
-        float S0 = nDotS + m_Slabs[i].m_fD0;
-        float S1 = nDotS + m_Slabs[i].m_fD1;
-        if (nDotD != 0.f)
-        {
-            float t0 = -S0 / nDotD;
-            float t1 = -S1 / nDotD;
-            if (t0 > t1)
-                SwapValues(t0, t1);
-
-            interval[i].m_fT0 = t0;
-            interval[i].m_fT1 = t1;
-        }
-        else if (AreSameSign(S0, S1))
-        { 
-            // outside the planes planes
-            interval[i].m_fT0 = 1.f;
-            interval[i].m_fT1 = 0.f;
-        }
-    }
 
     for (uint32 i = 0; i < 3; ++i)
     {
@@ -92,8 +69,11 @@ bool Cube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a
         return false;
 
     // smallest positive t value
-    if (SetIntersectionFromLowestPositive(a_Hit, maxInterval))
+    LowestPostiveIntersection lpi = FindLowestPositive(a_fTMin, a_fTMax, maxInterval);
+    if (lpi.m_bDidIntersect)
     {
+        a_Hit.m_fT = lpi.m_fT;
+        a_Hit.m_vNormal = lpi.m_vNormal;
         a_Hit.m_vPoint = a_Ray.PointAt(a_Hit.m_fT);
         a_Hit.m_Interval = maxInterval;
         a_Hit.m_pMaterial = m_pMaterial;
@@ -103,6 +83,11 @@ bool Cube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a
 }
 
 
+
+void AACube::CreateBoundingBox()
+{
+    m_BoundingBox = Bbox(m_vCorner, m_vCorner + m_vDiagonal);
+}
 
 AACube::AACube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material * a_pMaterial) :
     Cube(a_pMaterial),
@@ -126,6 +111,8 @@ AACube::AACube(Vector3f a_vCorner, Vector3f a_vDiagonal, Material * a_pMaterial)
        -a_vCorner.z() - a_vDiagonal.z(),
        Vector3f(0,0,1)
     };
+
+    CreateBoundingBox();
 }
 
 AACube::~AACube()

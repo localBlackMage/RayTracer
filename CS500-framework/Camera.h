@@ -7,17 +7,16 @@ class Camera
 {
 protected:
     Vector3f m_vEye;
-    Vector3f m_vLowerLeftCorner;
-    Vector3f m_vHorizontal;
-    Vector3f m_vVertical;
+    Vector3f m_vX, m_vY, m_vZ;
+
     Quaternionf m_qOrientation;
-    float m_fRY;
+    float m_fWidth, m_fHeight, m_fRX, m_fRY;
 
 public:
-    Camera(const Vector3f& a_vEye, const Quaternionf& a_qOrientation, const float a_fRY);
+    Camera(const Vector3f & a_vEye, const Quaternionf & a_qOrientation, float a_fWidth, float a_fHeight, float a_fRY);
     ~Camera();
 
-    Ray GetRay(float a_fU, float a_fV);
+    Ray GetRay(float a_fX, float a_fY);
 };
 
 #endif //CAMERA_H

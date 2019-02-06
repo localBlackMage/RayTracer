@@ -5,7 +5,7 @@ Ray::Ray()
 
 Ray::Ray(const Vector3f & a_vOrigin, const Vector3f & a_vDirection) :
     m_vOrigin(a_vOrigin),
-    m_vDirection(a_vDirection)
+    m_vDirection(a_vDirection.normalized())
 {}
 
 Ray::Ray(const Ray & rhs) : 

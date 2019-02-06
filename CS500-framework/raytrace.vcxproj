@@ -53,10 +53,18 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(SolutionDir)External\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)External\include\freeglut\;$(SolutionDir)External\include\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)External\include\freeglut\;$(SolutionDir)External\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)External\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>libs\freeglut;libs\assimp\include;libs</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Eternal\include\freeglut;Eternal\include\assimp\include;Eternal\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;FREEGLUT_STATIC;_LIB;FREEGLUT_LIB_PRAGMAS=0;EIGEN_DONT_ALIGN_STATICALLY;_ITERATOR_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -68,7 +76,7 @@
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libs\assimp\lib\assimp.lib;libs\freeglut\freeglut.lib;libs\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;External\include\freeglut\freeglut.lib;External\include\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -78,10 +86,16 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
+    <PreLinkEvent>
+      <Command>copy "$(SolutionDir)External\bin\$(Platform)\$(Configuration)\*.pdb" "$(SolutionDir)$(Configuration)\"</Command>
+    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)External\bin\$(Platform)\$(Configuration)\*.dll" "$(SolutionDir)$(Configuration)\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>libs\freeglut;libs\assimp\include;libs</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Eternal\include\freeglut;Eternal\include\assimp\include;Eternal\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;FREEGLUT_STATIC;_LIB;FREEGLUT_LIB_PRAGMAS=0;EIGEN_DONT_ALIGN_STATICALLY;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -92,7 +106,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libs\assimp\lib\assimp.lib;libs\freeglut\freeglut.lib;libs\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;External\include\freeglut\freeglut.lib;External\include\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -104,6 +118,13 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)External\bin\$(Platform)\$(Configuration)\*.dll" "$(SolutionDir)$(Configuration)\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoundingBox.cpp" />
@@ -115,6 +136,7 @@
     <ClCompile Include="geom.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
+    <ClCompile Include="Minimizer.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="raytrace.cpp" />
     <ClCompile Include="RayTracer.cpp" />
@@ -138,6 +160,8 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="MathDefines.h" />
     <ClInclude Include="MathFunctions.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Minimizer.h" />
     <ClInclude Include="NiceTypes.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayTracer.h" />

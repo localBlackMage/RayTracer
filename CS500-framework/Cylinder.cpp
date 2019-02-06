@@ -1,43 +1,37 @@
 #include "stdafx.h"
 
+void Cylinder::CreateBoundingBox()
+{
+    Vector3f diag = Vector3f(m_fRadius, m_fRadius, m_fRadius);
+    Bbox aBox = Bbox(m_vLocation + m_vAxis - diag, m_vLocation + m_vAxis + diag);
+    Bbox bBox = Bbox(m_vLocation - diag, m_vLocation + diag);
+
+    Vector3f aL = aBox.min();
+    Vector3f aU = aBox.max();
+    Vector3f bL = bBox.min();
+    Vector3f bU = bBox.max();
+
+    float minX = std::min(aL.x(), bL.x());
+    float minY = std::min(aL.y(), bL.y());
+    float minZ = std::min(aL.z(), bL.z());
+
+    float maxX = std::max(aU.x(), bU.x());
+    float maxY = std::max(aU.y(), bU.y());
+    float maxZ = std::max(aU.z(), bU.z());
+
+    m_BoundingBox = Bbox(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ));
+}
+
 Cylinder::Cylinder(const Vector3f & a_vLocation, const Vector3f& a_vAxis, float a_fRadius, Material * a_pMaterial) :
     Shape(a_pMaterial),
     m_vLocation(a_vLocation),
     m_vAxis(a_vAxis),
     m_fLength(a_vAxis.norm()),
     m_fRadius(a_fRadius),
-    m_qRotation(Quaternionf::FromTwoVectors(m_vAxis, Vector3f(0, 0, 1)))
+    m_qRotation(Quaternionf::FromTwoVectors(m_vAxis, Vector3f::UnitZ()).normalized())
 {
-    float diameter = 2.f * m_fRadius;
-    BoundingBox leftCap = BoundingBox(this, m_vLocation, diameter, diameter, diameter);
-    BoundingBox rightCap = BoundingBox(this, m_vLocation + m_vAxis, diameter, diameter, diameter);
-
-    const Vector3f& leftTopRightForward = leftCap.TopRightForward();
-    const Vector3f& leftBottomLeftBack = leftCap.BottomLeftBack();
-    const Vector3f& rightTopRightForward = rightCap.TopRightForward();
-    const Vector3f& rightBottomLeftBack = rightCap.BottomLeftBack();
-
-    float maxX, maxY, maxZ, minX, minY, minZ;
-    maxX = fabsf(std::max(leftTopRightForward.x(), rightTopRightForward.x()));
-    minX = fabsf(std::max(leftBottomLeftBack.x(), rightBottomLeftBack.x()));
-
-    maxY = fabsf(std::max(leftTopRightForward.y(), rightTopRightForward.y()));
-    minY = fabsf(std::max(leftBottomLeftBack.y(), rightBottomLeftBack.y()));
-
-    maxZ = fabsf(std::max(leftTopRightForward.z(), rightTopRightForward.z()));
-    minZ = fabsf(std::max(leftBottomLeftBack.z(), rightBottomLeftBack.z()));
-
-    if (maxX < minX) SwapValues(maxX, minX);
-    if (maxY < minY) SwapValues(maxY, minY);
-    if (maxZ < minZ) SwapValues(maxZ, minZ);
-
-    float width = maxX - minX;
-    float height = maxY - minY;
-    float depth = maxZ - minZ;
-
-    m_pBoundingBox = new BoundingBox(this, m_vLocation + (m_vAxis * 0.5f), width, height, depth);
-
     m_Slab = { 0.f, -m_fLength, Vector3f(0, 0, 1) };
+    CreateBoundingBox();
 }
 
 Cylinder::~Cylinder()
@@ -46,18 +40,17 @@ Cylinder::~Cylinder()
 
 bool Cylinder::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a_Hit) const
 {
-    const Vector3f& S = a_Ray.Origin();
-    const Vector3f& D = a_Ray.Direction();
-    Vector3f Sprime = m_qRotation._transformVector(S - m_vLocation);
-    Vector3f Dprime = m_qRotation._transformVector(D); // * t
+    const Vector3f Sprime = m_qRotation._transformVector(a_Ray.Origin() - m_vLocation);
+    const Vector3f Dprime = m_qRotation._transformVector(a_Ray.Direction()); // * t
 
     Interval slabInterval, cylinderInterval, finalInterval;
 
 #pragma region Slab Interval
-    slabInterval.m_vNormal0 = slabInterval.m_vNormal1 = Vector3f(0, 0, 1);
+    slabInterval.m_vNormal0 = Vector3f(0, 0, 1);
+    slabInterval.m_vNormal1 = Vector3f(0, 0, -1);
 
-    float nDotD = m_Slab.m_vNormal.dot(D);
-    float nDotS = m_Slab.m_vNormal.dot(S);
+    float nDotD = m_Slab.m_vNormal.dot(Dprime);
+    float nDotS = m_Slab.m_vNormal.dot(Sprime);
     float S0 = nDotS + m_Slab.m_fD0;
     float S1 = nDotS + m_Slab.m_fD1;
     if (nDotD != 0.f)
@@ -65,10 +58,16 @@ bool Cylinder::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection
         float t0 = -S0 / nDotD;
         float t1 = -S1 / nDotD;
         if (t0 > t1)
+        {
             SwapValues(t0, t1);
+            slabInterval.m_vNormal0 = Vector3f(0, 0, -1);
+            slabInterval.m_vNormal1 = Vector3f(0, 0, 1);
+        }
 
         slabInterval.m_fT0 = t0;
         slabInterval.m_fT1 = t1;
+        slabInterval.m_vNormal0 = m_qRotation.conjugate()._transformVector(slabInterval.m_vNormal0);
+        slabInterval.m_vNormal1 = m_qRotation.conjugate()._transformVector(slabInterval.m_vNormal1);
     }
     else if (AreSameSign(S0, S1))
     {
@@ -79,9 +78,9 @@ bool Cylinder::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection
 #pragma endregion
 
 #pragma region Cylinder Interval
-    float a = D.x() * D.x() + D.y() * D.y();
-    float b = D.x() * S.x() + D.y() * S.y();
-    float c = S.x() * S.x() + S.y() * S.y() - (m_fRadius * m_fRadius);
+    float a = Dprime.x() * Dprime.x() + Dprime.y() * Dprime.y();
+    float b = 2.f * (Dprime.x() * Sprime.x() + Dprime.y() * Sprime.y());
+    float c = Sprime.x() * Sprime.x() + Sprime.y() * Sprime.y() - (m_fRadius * m_fRadius);
     float sqrtInner = (b * b - 4.f * a * c);
 
     // Intersection possible
@@ -97,11 +96,20 @@ bool Cylinder::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection
 
         cylinderInterval.m_fT0 = t0;
         cylinderInterval.m_fT1 = t1;
-    }
-#pragma endregion
 
-    //finalInterval.m_fT0 = std::max(std::max(0.f, slabInterval.m_fT0), cylinderInterval.m_fT0);
-    //finalInterval.m_fT1 = std::max(std::min(FLT_MAX, slabInterval.m_fT1), cylinderInterval.m_fT1);
+        cylinderInterval.m_vNormal0 = Sprime + t0 * Dprime;
+        cylinderInterval.m_vNormal0.z() = 0;
+        cylinderInterval.m_vNormal0.normalize();
+        cylinderInterval.m_vNormal0 = m_qRotation.conjugate()._transformVector(cylinderInterval.m_vNormal0);
+
+        cylinderInterval.m_vNormal1 = Sprime + t1 * Dprime;
+        cylinderInterval.m_vNormal1.z() = 0;
+        cylinderInterval.m_vNormal1.normalize();
+        cylinderInterval.m_vNormal1 = m_qRotation.conjugate()._transformVector(cylinderInterval.m_vNormal1);
+    }
+    else
+        return false;
+#pragma endregion
 
     if (slabInterval.m_fT0 != 1.f && slabInterval.m_fT1 != 0.f)
     {
@@ -117,8 +125,11 @@ bool Cylinder::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection
         return false;
 
     // smallest positive t value
-    if (SetIntersectionFromLowestPositive(a_Hit, finalInterval))
+    LowestPostiveIntersection lpi = FindLowestPositive(a_fTMin, a_fTMax, finalInterval);
+    if (lpi.m_bDidIntersect)
     {
+        a_Hit.m_fT = lpi.m_fT;
+        a_Hit.m_vNormal = lpi.m_vNormal;
         a_Hit.m_vPoint = a_Ray.PointAt(a_Hit.m_fT);
         a_Hit.m_Interval = finalInterval;
         a_Hit.m_pMaterial = m_pMaterial;

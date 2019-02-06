@@ -16,3 +16,5 @@ using ulong = unsigned long long;
 #else               
 using ulong = unsigned long;
 #endif
+
+const float INF = std::numeric_limits<float>::max();
