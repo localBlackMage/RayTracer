@@ -4,28 +4,47 @@
 Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 {
     Intersection hData;
-    if (m_pWorld->Hit(a_Ray, 0.0001f, INF, hData))
+    Color C = Color(0, 0, 0); // Accumulated Color
+    Vector3f W = Vector3f(1, 1, 1); // Accumulated Weight
+    if (m_pWorld->Hit(a_Ray, MINIMUM, INF, hData))
     {
-        //Ray scattered;
-        //Vec3 attenuation;
-        //if (a_iDepth < 50 && hData.m_pMaterial->Scatter(a_Ray, hData, attenuation, scattered))
+        Ray scattered;
+        if (/*a_iDepth < 50 && */hData.m_pMaterial->isLight())
+        {
+            return static_cast<Light*>(hData.m_pMaterial)->Radiance();
+        }
+        else
+        {
+            while (RandomFloat(0.f, 1.f) < RUSSIAN_ROULETTE)
+            {
+                Vector3f omegaI = hData.m_pMaterial->SampleBRDF(hData.m_vNormal);
+                Ray scatterRay(hData.m_vPoint, omegaI);
+                if (!m_pWorld->Hit(scatterRay, MINIMUM, INF, hData))
+                    break;
+                Vector3f f = hData.m_pMaterial->EvalScattering(hData.m_vNormal, omegaI);
+            }
+            //return hData.m_pMaterial->EvalScattering(a_Ray, hData, scattered);
+        }
+
+        //if (a_iDepth < 50 && hData.m_pMaterial->EvalScattering(a_Ray, hData, attenuation, scattered))
         //{
-        //    return attenuation * Color(scattered, a_World, a_iDepth + 1);
+        //    return attenuation * PathTrace(scattered, a_iDepth + 1);
         //}
         //else
-        //    return Vec3(0, 0, 0, 1);
+        //    return Color(0, 0, 0, 0);
 
         //return hData.m_pMaterial->Kd;
-        //float depth = hData.m_fT / 10.f;
+        //float depth = (hData.m_fT - 5.f) / 4.f;
         //return Color(depth, depth, depth);
-        return Vector3f(fabsf(hData.m_vNormal.x()), fabsf(hData.m_vNormal.y()), fabsf(hData.m_vNormal.z()));
+        //return Vector3f(fabsf(hData.m_vNormal.x()), fabsf(hData.m_vNormal.y()), fabsf(hData.m_vNormal.z()));
     }
     else
     {
-        Vector3f unitDir = a_Ray.Direction().normalized();
-        float t = 0.5f * (unitDir.y() + 1.f);
+        //Vector3f unitDir = a_Ray.Direction().normalized();
+        //float t = 0.5f * (unitDir.y() + 1.f);
 
-        return (1.f - t) * Vector3f(1, 1, 1) + t * Vector3f(0.5f, 0.7f, 1.f);
+        //return (1.f - t) * Vector3f(1, 1, 1) + t * Vector3f(0.5f, 0.7f, 1.f);
+        return Color(0, 0, 0, 0);
     }
 }
 
@@ -33,7 +52,7 @@ RayTracer::RayTracer() :
     m_pCamera(nullptr),
     m_pWorld(new ShapeList()),
     m_pLights(new ShapeList()),
-    m_fNumRaysPerPixel(50.f)
+    m_fNumRaysPerPixel(10.f)
 {
 }
 

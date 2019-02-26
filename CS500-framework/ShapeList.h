@@ -20,6 +20,7 @@ public:
     void AddShape(Shape* a_pShape);
     uint32 NumShapes() const { return m_ShapeList.size(); }
     void CreateTree();
+    Shape* GetRandomObject() const;
 
     bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
 };

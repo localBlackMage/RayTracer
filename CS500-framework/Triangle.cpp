@@ -62,8 +62,13 @@ bool Triangle::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection
         a_Hit.m_vNormal = ((1.f - alpha - beta) * m_vdA.nrm + alpha * m_vdB.nrm + beta * m_vdC.nrm).normalized();
         a_Hit.m_fT = t;
         a_Hit.m_pMaterial = m_pMaterial;
+        a_Hit.m_pShape = this;
         return true;
     }
 
     return false;
+}
+
+void Triangle::GetRandomIntersectionPoint(Intersection & a_Intersection) const
+{
 }

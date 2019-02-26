@@ -4,6 +4,7 @@
 #define INTERVAL_H
 
 class Material;
+class Shape;
 
 struct Interval
 {
@@ -19,6 +20,7 @@ struct Intersection
     Vector3f m_vPoint;
     Vector3f m_vNormal;
     Material* m_pMaterial = nullptr;
+    const Shape* m_pShape = nullptr;
     Interval m_Interval;
 };
 

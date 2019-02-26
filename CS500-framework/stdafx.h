@@ -52,6 +52,7 @@ using namespace gl;
 #include "MathDefines.h"
 #include "MathFunctions.h"
 
+#include "RTStopWatch.h"
 #include "Ray.h"
 #include "Interval.h"
 #include "Material.h"

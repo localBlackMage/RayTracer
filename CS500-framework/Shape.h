@@ -19,6 +19,7 @@ public:
 
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const = 0;
     Bbox GetBoundingBox() const { return m_BoundingBox; }
+    virtual void GetRandomIntersectionPoint(Intersection& a_Intersection) const = 0;
 };
 
 Bbox bounding_box(const Shape* obj);

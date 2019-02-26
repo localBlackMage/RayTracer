@@ -77,6 +77,7 @@ bool Cube::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection & a
         a_Hit.m_vPoint = a_Ray.PointAt(a_Hit.m_fT);
         a_Hit.m_Interval = maxInterval;
         a_Hit.m_pMaterial = m_pMaterial;
+        a_Hit.m_pShape = this;
         return true;
     }
     return false;

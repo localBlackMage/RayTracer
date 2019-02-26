@@ -18,6 +18,7 @@ public:
     virtual ~Cube();
 
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
+    virtual void GetRandomIntersectionPoint(Intersection& a_Intersection) const {};
 };
 
 class AACube : public Cube
@@ -32,6 +33,7 @@ public:
     virtual ~AACube();
 
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
+    virtual void GetRandomIntersectionPoint(Intersection& a_Intersection) const {};
 };
 
 #endif //CUBE_H

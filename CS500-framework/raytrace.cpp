@@ -14,8 +14,15 @@ std::uniform_real_distribution<> myrandom(0.0, 1.0);
 
 Scene::Scene() :
     m_pRayTracer(new RayTracer()),
-    currentMat(nullptr)
+    currentMat(nullptr),
+    m_pStopWatch(new RTStopWatch())
 { 
+}
+
+Scene::~Scene()
+{
+    delete m_pRayTracer;
+    delete m_pStopWatch;
 }
 
 void Scene::Finit()
@@ -136,13 +143,16 @@ void Scene::Command(const std::vector<std::string>& strings,
 
 void Scene::TraceImage(Color* image, const int pass)
 {
+    m_pStopWatch->Reset();
     fprintf(stderr, "\nNumObjects %d\n", m_pRayTracer->NumShapes());
-//#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
+#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
     for (int y = 0; y < height; y++) {
-        fprintf(stderr, "Rendering %4d\r", y);
+        //fprintf(stderr, "Rendering %4d\r", y);
         for (int x = 0; x < width; x++) {
             image[y*width + x] = m_pRayTracer->GetColor(x, y);
         }
     }
-    fprintf(stderr, "\n");
+    fprintf(stderr, "Seconds: %d\n", m_pStopWatch->ElapsedInSec());
+    fprintf(stderr, "Milliseconds: %d\n", m_pStopWatch->ElapsedInMs());
+    fprintf(stderr, "Microseconds: %d\n", m_pStopWatch->ElapsedInUs());
 }

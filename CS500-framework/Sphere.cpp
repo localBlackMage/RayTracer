@@ -35,6 +35,7 @@ bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection &
             a_Hit.m_vPoint = a_Ray.PointAt(temp);
             a_Hit.m_vNormal = (a_Hit.m_vPoint - m_vCenter) / m_fRadius;
             a_Hit.m_pMaterial = m_pMaterial;
+            a_Hit.m_pShape = this;
             return true;
         }
 
@@ -45,8 +46,22 @@ bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection &
             a_Hit.m_vPoint = a_Ray.PointAt(temp);
             a_Hit.m_vNormal = (a_Hit.m_vPoint - m_vCenter) / m_fRadius;
             a_Hit.m_pMaterial = m_pMaterial;
+            a_Hit.m_pShape = this;
             return true;
         }
     }
     return false;
+}
+
+void Sphere::GetRandomIntersectionPoint(Intersection & a_Intersection) const
+{
+    float a = RandomFloat(0.f, 1.f);
+    float b = RandomFloat(0.f, 1.f);
+    float z = 2.f * a - 1.f;
+    float r = sqrtf(1.f - z * z);
+    float c = 2.f * PI * b;
+
+    a_Intersection.m_vNormal = Vector3f(r * cosf(c), r * sinf(c), z).normalized();
+    a_Intersection.m_vPoint = m_vCenter + m_fRadius * a_Intersection.m_vNormal;
+    a_Intersection.m_pShape = this;
 }

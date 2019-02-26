@@ -20,6 +20,9 @@ public:
     inline float Radius() const { return m_fRadius; }
 
     virtual bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
+
+    // "SampleSphere(C, R)" function
+    virtual void GetRandomIntersectionPoint(Intersection& a_Intersection) const;
 };
 
 #endif //SPHERE_H

@@ -53,6 +53,7 @@
       <Filter>Shapes</Filter>
     </ClCompile>
     <ClCompile Include="Minimizer.cpp" />
+    <ClCompile Include="RTStopWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="realtime.h" />
@@ -106,6 +107,7 @@
     </ClInclude>
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Minimizer.h" />
+    <ClInclude Include="RTStopWatch.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

@@ -12,6 +12,12 @@ void ShapeList::CreateTree()
     m_Tree = KDTree(m_ShapeList.begin(), m_ShapeList.end());
 }
 
+Shape * ShapeList::GetRandomObject() const
+{
+    uint32 index = RandomUInt(0, uint32(m_ShapeList.size()));
+    return m_ShapeList[index];
+}
+
 bool ShapeList::Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const
 {
     //Intersection hData;

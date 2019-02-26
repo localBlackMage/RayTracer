@@ -143,6 +143,7 @@
     <ClCompile Include="readAssimpFile.cpp" />
     <ClCompile Include="realtime.cpp" />
     <ClCompile Include="rgbe.cpp" />
+    <ClCompile Include="RTStopWatch.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapeList.cpp" />
     <ClCompile Include="Slab.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="realtime.h" />
     <ClInclude Include="geom.h" />
+    <ClInclude Include="RTStopWatch.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="ShapeList.h" />
     <ClInclude Include="Slab.h" />

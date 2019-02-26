@@ -8,6 +8,7 @@ class Shape;
 // Scene
 //class Realtime;
 class RayTracer;
+class RTStopWatch;
 
 class Scene {
 public:
@@ -15,8 +16,10 @@ public:
     //Realtime* realtime;         // Remove this (realtime stuff)
     RayTracer* m_pRayTracer;
     Material* currentMat;
+    RTStopWatch* m_pStopWatch;
 
     Scene();
+    ~Scene();
     void Finit();
 
     // The scene reader-parser will call the Command method with the
