@@ -94,10 +94,10 @@ void recurseModelNodes(Scene* scene,
         }
         
         // Loop through all faces, recording indices
-        for (unsigned int t=0;  t<aimesh->mNumFaces;  ++t) {
+        for (uint32 t=0;  t<aimesh->mNumFaces;  ++t) {
             aiFace* aiface = &aimesh->mFaces[t];
             //printf("%d: %d %d\n", t, aiface->mNumIndices, aimesh->mNumFaces);
-            for (int ii = 2;  ii < aiface->mNumIndices;  ii++) {
+            for (uint32 ii = 2;  ii < aiface->mNumIndices;  ii++) {
                 meshdata->triangles.push_back(TriData(aiface->mIndices[0],
                                                       aiface->mIndices[1],
                                                       aiface->mIndices[2])); 

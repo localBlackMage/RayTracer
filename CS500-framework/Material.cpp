@@ -68,8 +68,8 @@ Color Material::EvalScattering(const Vector3f & a_vNormal, const Vector3f & a_vO
 
 Vector3f Material::SampleBRDF(const Vector3f a_vNormal)
 {
-    float a = RandomFloat(0.f, 1.f);
-    float b = RandomFloat(0.f, 1.f); // I suspect these are Monte Carlo values, not random
+    float a = float(MersenneTwisterRandom(RNGen));
+    float b = float(MersenneTwisterRandom(RNGen));
     
     return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b);
 }

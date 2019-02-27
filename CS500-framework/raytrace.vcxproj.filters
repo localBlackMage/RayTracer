@@ -52,8 +52,10 @@
     <ClCompile Include="Slab.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
-    <ClCompile Include="Minimizer.cpp" />
     <ClCompile Include="RTStopWatch.cpp" />
+    <ClCompile Include="Minimizer.cpp">
+      <Filter>RayTracing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="realtime.h" />
@@ -106,8 +108,10 @@
       <Filter>Shapes</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Minimizer.h" />
     <ClInclude Include="RTStopWatch.h" />
+    <ClInclude Include="Minimizer.h">
+      <Filter>RayTracing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

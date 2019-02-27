@@ -13,7 +13,7 @@ bool PointInsideBBox(const Bbox & box, const Vector3f & point)
 Minimizer::Scalar Minimizer::minimumOnObject(Shape * obj)
 {
     Intersection hitData = m_HitData;
-    if (obj->Hit(m_Ray, 0.0001f, INF, hitData))
+    if (obj->Hit(m_Ray, MINIMUM, INF, hitData))
     {
         if (hitData.m_fT < m_fT)
         {
@@ -37,7 +37,7 @@ Minimizer::Scalar Minimizer::minimumOnVolume(const Bbox & box)
 
     AACube cube = AACube(L, diag, nullptr);
     Intersection hitData;
-    if (cube.Hit(m_Ray, 0.0001f, INF, hitData))
+    if (cube.Hit(m_Ray, MINIMUM, INF, hitData))
         return hitData.m_fT;
     else
         return INF;

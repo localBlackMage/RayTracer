@@ -9,7 +9,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
     if (m_pWorld->Hit(a_Ray, MINIMUM, INF, hData))
     {
         Ray scattered;
-        if (/*a_iDepth < 50 && */hData.m_pMaterial->isLight())
+        if (hData.m_pMaterial->isLight())
         {
             return static_cast<Light*>(hData.m_pMaterial)->Radiance();
         }
@@ -23,15 +23,10 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                     break;
                 Vector3f f = hData.m_pMaterial->EvalScattering(hData.m_vNormal, omegaI);
             }
-            //return hData.m_pMaterial->EvalScattering(a_Ray, hData, scattered);
+            return Color(0, 0, 0);
         }
 
-        //if (a_iDepth < 50 && hData.m_pMaterial->EvalScattering(a_Ray, hData, attenuation, scattered))
-        //{
-        //    return attenuation * PathTrace(scattered, a_iDepth + 1);
-        //}
-        //else
-        //    return Color(0, 0, 0, 0);
+
 
         //return hData.m_pMaterial->Kd;
         //float depth = (hData.m_fT - 5.f) / 4.f;
@@ -44,7 +39,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
         //float t = 0.5f * (unitDir.y() + 1.f);
 
         //return (1.f - t) * Vector3f(1, 1, 1) + t * Vector3f(0.5f, 0.7f, 1.f);
-        return Color(0, 0, 0, 0);
+        return Color(0, 0, 0);
     }
 }
 

@@ -19,4 +19,10 @@ constexpr float     RUSSIAN_ROULETTE = 0.8f;
 
 constexpr float     MINIMUM = 0.0001f;
 
+//// A good quality *thread-safe* Mersenne Twister random number generator.
+//#include <random>
+std::mt19937_64 RNGen;
+std::uniform_real_distribution<> MersenneTwisterRandom(0.0f, 1.0f);
+// Call myrandom(RNGen) to get a uniformly distributed random number in [0,1].
+
 #endif
