@@ -18,7 +18,7 @@ Shape * ShapeList::GetRandomObject() const
     return m_ShapeList[index];
 }
 
-bool ShapeList::Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const
+bool ShapeList::Hit(const Ray& a_Ray, Intersection& a_Hit, float a_fTMin/* = MINIMUM*/, float a_fTMax/* = INF*/) const
 {
     //Intersection hData;
     //bool hitAnything = false;
@@ -37,10 +37,21 @@ bool ShapeList::Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection
 
     Minimizer minimizer(a_Ray);
     float minDist = BVMinimize(m_Tree, minimizer);
-    if (minDist >= 0.f && minDist < INF)
+    if (minDist >= a_fTMin && minDist < a_fTMax)
     {
         a_Hit = minimizer.m_HitData;
         return true;
     }
     return false;
+}
+
+void ShapeList::SampleLight(Intersection& a_Intersection)
+{
+    Shape * pShape = GetRandomObject();
+    pShape->GetRandomIntersectionPoint(a_Intersection);
+}
+
+float ShapeList::PDFLight(const Shape* a_pShape) const
+{
+    return 1.f / (a_pShape->Area() * float(m_ShapeList.size()));
 }

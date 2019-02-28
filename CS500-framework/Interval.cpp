@@ -17,14 +17,14 @@ void SetMinMaxInterval(Interval & a_IntToSet, const Interval & a_OtherInt)
 
 LowestPostiveIntersection FindLowestPositive(float a_fTMin, float a_fTMax, const Interval & a_Interval)
 {
-    if (a_Interval.m_fT0 < 0.f && a_Interval.m_fT1 < 0.f)
+    if (a_Interval.m_fT0 < EPSILON && a_Interval.m_fT1 < EPSILON)
     {
         return {false};
     }
 
     LowestPostiveIntersection lpi;
 
-    if (a_Interval.m_fT0 >= 0.f && a_Interval.m_fT1 >= 0.f)
+    if (a_Interval.m_fT0 >= EPSILON && a_Interval.m_fT1 >= EPSILON)
     {
         if (a_Interval.m_fT0 < a_Interval.m_fT1)
         {
@@ -39,7 +39,7 @@ LowestPostiveIntersection FindLowestPositive(float a_fTMin, float a_fTMax, const
             lpi.m_vNormal = a_Interval.m_vNormal1;
         }
     }
-    else if (a_Interval.m_fT0 >= 0.f)
+    else if (a_Interval.m_fT0 >= EPSILON)
     {
         lpi.m_bDidIntersect = true;
         lpi.m_fT = a_Interval.m_fT0;

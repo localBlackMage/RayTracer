@@ -7,7 +7,7 @@ void Sphere::CreateBoundingBox()
 }
 
 Sphere::Sphere(Vector3f a_vCenter, float a_fRadius, Material* a_pMaterial) :
-    Shape(a_pMaterial),
+    Shape(a_pMaterial, 4.f * PI * (a_fRadius * a_fRadius)),
     m_vCenter(a_vCenter),
     m_fRadius(a_fRadius)
 {
@@ -25,7 +25,7 @@ bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection &
     float c = oc.dot(oc) - m_fRadius * m_fRadius;
     float discriminant = b * b - a * c;
 
-    if (discriminant > 0)
+    if (discriminant > EPSILON)
     {
         float sqrtDisc = sqrtf(discriminant);
         float temp = (-b - sqrtDisc) / a;
@@ -55,13 +55,14 @@ bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection &
 
 void Sphere::GetRandomIntersectionPoint(Intersection & a_Intersection) const
 {
-    float a = RandomFloat(0.f, 1.f);
-    float b = RandomFloat(0.f, 1.f);
+    float a = MersenneRandFloat();
+    float b = MersenneRandFloat();
     float z = 2.f * a - 1.f;
     float r = sqrtf(1.f - z * z);
-    float c = 2.f * PI * b;
+    float c = PI_2 * b;
 
     a_Intersection.m_vNormal = Vector3f(r * cosf(c), r * sinf(c), z).normalized();
     a_Intersection.m_vPoint = m_vCenter + m_fRadius * a_Intersection.m_vNormal;
     a_Intersection.m_pShape = this;
+    a_Intersection.m_pMaterial = m_pMaterial;
 }

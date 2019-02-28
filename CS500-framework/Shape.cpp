@@ -1,7 +1,9 @@
 #include "stdafx.h"
+#include "Shape.h"
 
-Shape::Shape(Material * a_pMaterial/* = nullptr*/) :
-    m_pMaterial(a_pMaterial)
+Shape::Shape(Material * a_pMaterial/* = nullptr*/, float a_fArea/* = 0.f*/) :
+    m_pMaterial(a_pMaterial),
+    m_fArea(a_fArea)
 {}
 
 Shape::~Shape()

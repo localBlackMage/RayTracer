@@ -48,6 +48,7 @@ using namespace gl;
 #include <Eigen/StdVector>
 #include <Eigen_unsupported/Eigen/BVH>
 
+
 #include "NiceTypes.h"
 #include "MathDefines.h"
 #include "MathFunctions.h"

@@ -95,7 +95,7 @@ void Scene::Command(const std::vector<std::string>& strings,
         // syntax: light  r g b   
         // The rgb is the emission of the light
         // Creates a Material instance to be picked up by successive shapes
-        currentMat = new Light(Vector3f(f[1], f[2], f[3])); 
+        currentMat = new Light(Color(f[1], f[2], f[3])); 
     }
    
     else if (c == "sphere") {

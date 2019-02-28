@@ -13,6 +13,7 @@ float Rand_Zero_One();
 float Rand_Zero_LT_One();
 // Returns a Vector3f([-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5])
 Vector3f Rand_UnitSphere();
+float MersenneRandFloat();
 float RandomFloat(float min, float max);
 int RandomInt(int min, int max);
 uint32 RandomUInt(uint32 min, uint32 max);

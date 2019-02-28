@@ -3,6 +3,7 @@
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "Material.h"
 #endif //STB_IMAGE_IMPLEMENTATION
 
 //Color Material::LambertianScatter(const Ray & a_RayIn, const Intersection & a_HitData)
@@ -21,7 +22,8 @@
 
 Color Material::LambertianScatter(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
 {
-    return (a_vNormal.dot(a_vOmega)) *  Kd / PI; // needs omega sub i
+    //return Color((a_vNormal.dot(a_vOmega)) *  Kd / PI);
+    return Color(fabsf(a_vNormal.dot(a_vOmega)) *  Kd / PI);
 }
 
 Color Material::MetalScatter(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
@@ -66,10 +68,16 @@ Color Material::EvalScattering(const Vector3f & a_vNormal, const Vector3f & a_vO
     return (this->*m_pScatterFunctions[eMatType])(a_vNormal, a_vOmega);
 }
 
-Vector3f Material::SampleBRDF(const Vector3f a_vNormal)
+float Material::PDFBRDF(const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    float a = float(MersenneTwisterRandom(RNGen));
-    float b = float(MersenneTwisterRandom(RNGen));
+    //return (a_vNormal.dot(a_vOmegaI)) / PI;
+    return fabsf(a_vNormal.dot(a_vOmegaI)) / PI;
+}
+
+Vector3f Material::SampleBRDF(const Vector3f& a_vNormal)
+{
+    float a = MersenneRandFloat();
+    float b = MersenneRandFloat();
     
-    return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b);
+    return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b).normalized();
 }

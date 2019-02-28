@@ -84,7 +84,7 @@ bool Cylinder::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection
     float sqrtInner = (b * b - 4.f * a * c);
 
     // Intersection possible
-    if (sqrtInner >= 0.f)
+    if (sqrtInner >= EPSILON)
     {
         float den = 2.f * a;
 

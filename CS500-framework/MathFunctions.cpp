@@ -19,7 +19,7 @@ float GeometryFactor(const Intersection & a_A, const Intersection & a_B)
 {
     Vector3f D = a_A.m_vPoint - a_B.m_vPoint;
     float dDotD = D.dot(D);
-    return (a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD); // Possibly absolute value?
+    return fabsf((a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD)); // Possibly absolute value?
 }
 
 Vector3f SampleLobe(const Vector3f & a_vNormal, float c, float phi)
@@ -88,4 +88,13 @@ Vector3f Rand_UnitSphere()
     float y = Rand_Zero_One() - 0.5f;
     float z = Rand_Zero_One() - 0.5f;
     return Vector3f(x, y, z);
+}
+
+std::mt19937_64 RNGen;
+std::uniform_real_distribution<> MersenneTwisterRandom(0.0f, 1.0f);
+// Call MersenneTwisterRandom(RNGen) to get a uniformly distributed random number in [0,1].
+
+float MersenneRandFloat()
+{
+    return MersenneTwisterRandom(RNGen);
 }

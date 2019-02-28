@@ -62,7 +62,11 @@ public:
 
     //Color EvalScattering(const Ray& a_RayIn, const Intersection& a_HitData) const;
     Color EvalScattering(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
-    Vector3f SampleBRDF(const Vector3f a_vNormal);
+
+    float PDFBRDF(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+
+    // Returns omega sub i
+    Vector3f SampleBRDF(const Vector3f& a_vNormal);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,14 +76,11 @@ class Light : public Material
 {
 public:
 
-    Light(const Color e) : Material() { Kd = e; }
+    Light(const Color e) : Material() { m_bIsLight = true; Kd = e; }
     virtual bool isLight() { return true; }
     //virtual void apply(const unsigned int program);
 
     Color Radiance() const { return Kd; }
-    float PDFLight() const { return 0.f; }
-    float SampleLight() const { return 0.f; }
-
 };
 
 #endif //MATERIAL_H

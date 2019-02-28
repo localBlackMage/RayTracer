@@ -22,7 +22,9 @@ public:
     void CreateTree();
     Shape* GetRandomObject() const;
 
-    bool Hit(const Ray& a_Ray, float a_fTMin, float a_fTMax, Intersection& a_Hit) const;
+    bool Hit(const Ray& a_Ray, Intersection& a_Hit, float a_fTMin = MINIMUM, float a_fTMax = INF) const;
+    void SampleLight(Intersection& a_Intersection);
+    float PDFLight(const Shape* a_pShape) const;
 };
 
 #endif //SHAPE_LIST_H
