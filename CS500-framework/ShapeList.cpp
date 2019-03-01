@@ -14,7 +14,10 @@ void ShapeList::CreateTree()
 
 Shape * ShapeList::GetRandomObject() const
 {
-    uint32 index = RandomUInt(0, uint32(m_ShapeList.size()));
+    //// choose one light uniformly
+    //std::uniform_int_distribution<uint32> UIntRand(0, m_ShapeList.size() - 1);
+    //int index = UIntRand(RNGen);
+    uint32 index = 0;// RandomUInt(0, uint32(m_ShapeList.size()));
     return m_ShapeList[index];
 }
 
@@ -37,6 +40,8 @@ bool ShapeList::Hit(const Ray& a_Ray, Intersection& a_Hit, float a_fTMin/* = MIN
 
     Minimizer minimizer(a_Ray);
     float minDist = BVMinimize(m_Tree, minimizer);
+
+
     if (minDist >= a_fTMin && minDist < a_fTMax)
     {
         a_Hit = minimizer.m_HitData;

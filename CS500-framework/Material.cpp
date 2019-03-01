@@ -22,8 +22,7 @@
 
 Color Material::LambertianScatter(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
 {
-    //return Color((a_vNormal.dot(a_vOmega)) *  Kd / PI);
-    return Color(fabsf(a_vNormal.dot(a_vOmega)) *  Kd / PI);
+    return fabsf(a_vNormal.dot(a_vOmega)) * (Kd / PI);
 }
 
 Color Material::MetalScatter(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
@@ -58,20 +57,14 @@ void Material::setTexture(const std::string path)
     //stbi_image_free(image);
 }
 
-//Color Material::EvalScattering(const Ray & a_RayIn, const Intersection & a_HitData) const
-//{
-//    return m_pScatterFunctions[eMatType](a_RayIn, a_HitData);
-//}
-
 Color Material::EvalScattering(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
 {
     return (this->*m_pScatterFunctions[eMatType])(a_vNormal, a_vOmega);
 }
 
-float Material::PDFBRDF(const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
+float Material::PdfBRDF(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
 {
-    //return (a_vNormal.dot(a_vOmegaI)) / PI;
-    return fabsf(a_vNormal.dot(a_vOmegaI)) / PI;
+    return fabsf(a_vNormal.dot(a_vOmega) / PI);
 }
 
 Vector3f Material::SampleBRDF(const Vector3f& a_vNormal)

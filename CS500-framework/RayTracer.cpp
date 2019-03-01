@@ -8,7 +8,7 @@ Color operator*(const Color& lhs, const Vector3f& rhs)
 
 Color operator*(const Vector3f& lhs, const Color& rhs)
 {
-    return Color(rhs[0] * lhs[0], rhs[1] * lhs[1], rhs[2] * lhs[2]);
+    return rhs * lhs;
 }
 
 Color operator*(const Color& lhs, const Color& rhs)
@@ -19,84 +19,81 @@ Color operator*(const Color& lhs, const Color& rhs)
 Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 {
     // Initial Ray
-    Intersection hData;
+    Intersection P, L, I, Q;
     Color C = Color(0, 0, 0); // Accumulated Color
     Vector3f W = Vector3f(1, 1, 1); // Accumulated Weight
-    if (m_pWorld->Hit(a_Ray, hData))
+    if (m_pWorld->Hit(a_Ray, P))
     {
-        if (hData.m_pMaterial->isLight())
+        if (P.m_pMaterial->isLight())
         {
-            return static_cast<Light*>(hData.m_pMaterial)->Radiance();
+            return static_cast<Light*>(P.m_pMaterial)->Radiance();
         }
         else
         {
-            C = hData.m_pMaterial->Kd;
-            while (MersenneRandFloat() < RUSSIAN_ROULETTE)
+            while (MersenneRandFloat() <= RUSSIAN_ROULETTE)
             {
-                // Explicit light connection
-                Intersection hDataL;
-                m_pLights->SampleLight(hDataL); // Randomly chosen light, a randomly chosen point on that light and it's normal
-                float p = m_pLights->PDFLight(hDataL.m_pShape) / GeometryFactor(hData, hDataL);
-                Vector3f omegaI = (hDataL.m_vPoint - hData.m_vPoint).normalized();
+                Vector3f omegaI;
                 Color f;
-                Intersection hDataI;
-                // No intersections between this point and the light
-                if (m_pWorld->Hit(Ray(hDataL.m_vPoint + (omegaI * 0.01f), omegaI), hDataI) &&
-                    hDataI.m_pShape == hDataL.m_pShape && 
-                    p > 0.f)
+                float p;
+#pragma region Explicit light connection
+                m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
+                p = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
+                omegaI = (L.m_vPoint - P.m_vPoint).normalized();
+
+                // Cast the shadow ray
+                Ray explicitRay = Ray(P.m_vPoint, omegaI); ///* + (omegaI * EPSILON)*/
+                if (p > 0.f && 
+                    m_pWorld->Hit(explicitRay, I) && 
+                    I.m_vPoint.isApprox(L.m_vPoint) && 
+                    I.m_pShape == L.m_pShape)
                 {
-                    f = hDataI.m_pMaterial->EvalScattering(hData.m_vNormal, omegaI);
-                    C += W * static_cast<Light*>(hDataL.m_pMaterial)->Radiance() * f / p;
+                    f = P.m_pMaterial->EvalScattering(P.m_vNormal, omegaI);
+                    C += W * (f / p) * static_cast<Light*>(L.m_pMaterial)->Radiance();
                 }
+#pragma endregion
 
+#pragma region Extend Path
+                omegaI = P.m_pMaterial->SampleBRDF(P.m_vNormal);
+                Ray extendedRay = Ray(P.m_vPoint, omegaI); // + (omegaI * EPSILON)
 
-                // Extend Path
-                Intersection hDataQ;
-                omegaI = hData.m_pMaterial->SampleBRDF(hData.m_vNormal);
-                Ray scatterRay(hData.m_vPoint + (omegaI * 0.01f), omegaI);
-                
-                if (!m_pWorld->Hit(scatterRay, hDataQ))
+                if (!m_pWorld->Hit(extendedRay, Q))
                     break;
 
-                f = hDataQ.m_pMaterial->EvalScattering(hDataQ.m_vNormal, omegaI);
-                p = hDataQ.m_pMaterial->PDFBRDF(hDataQ.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                f = P.m_pMaterial->EvalScattering(P.m_vNormal, omegaI);
+                p = P.m_pMaterial->PdfBRDF(P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
                 if (p < EPSILON)
-                    continue; // avoid division by 0
+                    break; // avoid division by 0
                 W = W * (f / p);
+#pragma endregion
                 
-                // Implicit Light connection
-                if (hDataQ.m_pMaterial->isLight())
+#pragma region Implicit Light connection
+                if (Q.m_pMaterial->isLight())
                 {
-                    C += W * static_cast<Light*>(hDataQ.m_pMaterial)->Radiance();
+                    C += W * static_cast<Light*>(Q.m_pMaterial)->Radiance();
                     break;
                 }
+#pragma endregion
 
                 // Step Forward
-                hData = hDataQ;
+                P = Q;
             }
             return C;
         }
+
         //return hData.m_pMaterial->Kd;
         //float depth = (hData.m_fT - 5.f) / 4.f;
         //return Color(depth, depth, depth);
         //return Vector3f(fabsf(hData.m_vNormal.x()), fabsf(hData.m_vNormal.y()), fabsf(hData.m_vNormal.z()));
     }
     // No intersection, return C as is
-    else
-    {
-        //Vector3f unitDir = a_Ray.Direction().normalized();
-        //float t = 0.5f * (unitDir.y() + 1.f);
-
-        //return (1.f - t) * Vector3f(1, 1, 1) + t * Vector3f(0.5f, 0.7f, 1.f);
-        return C;
-    }
+    return C;
 }
 
 RayTracer::RayTracer() :
     m_pCamera(nullptr),
     m_pWorld(new ShapeList()),
     m_pLights(new ShapeList()),
-    m_fNumRaysPerPixel(10.f)
+    m_fNumRaysPerPixel(64.f)
 {
 }
 
@@ -173,8 +170,8 @@ Color RayTracer::GetColor(uint32 i, uint32 j)
 
     for (uint32 s = 0; s < ns; ++s)
     {
-        float x = 2.f * (float(i) + Rand_Zero_LT_One() - halfWidth) / nx;
-        float y = 2.f * (float(j) + Rand_Zero_LT_One() - halfHeight) / ny;
+        float x = 2.f * (float(i) + MersenneRandFloat() - halfWidth) / nx;
+        float y = 2.f * (float(j) + MersenneRandFloat() - halfHeight) / ny;
 
         Ray ray = m_pCamera->GetRay(x, y);
         color += PathTrace(ray, 0);

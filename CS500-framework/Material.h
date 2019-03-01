@@ -63,7 +63,7 @@ public:
     //Color EvalScattering(const Ray& a_RayIn, const Intersection& a_HitData) const;
     Color EvalScattering(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
 
-    float PDFBRDF(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    float PdfBRDF(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
 
     // Returns omega sub i
     Vector3f SampleBRDF(const Vector3f& a_vNormal);
