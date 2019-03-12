@@ -61,16 +61,22 @@ void ReadScene(const std::string inName, Scene* scene)
     input.close();
 }
 
+Color LinearToGamma(const Color& a_Color)
+{
+    const static float EXPO = 1.f / 2.2f;
+    return pow(a_Color, EXPO);
+}
+
 // Write the image as a HDR(RGBE) image.  
 #include "rgbe.h"
-void WriteHdrImage(const std::string outName, const int width, const int height, Color* image)
+void WriteHdrImage(const std::string outName, const int width, const int height, Color* image, float numPasses)
 {
     // Turn image from a 2D-bottom-up array of Vector3D to an top-down-array of floats
     float* data = new float[width*height*3];
     float* dp = data;
     for (int y=height-1;  y>=0;  --y) {
         for (int x=0;  x<width;  ++x) {
-            Color pixel = image[y*width + x];
+            Color pixel = LinearToGamma(image[y*width + x] / numPasses);
             *dp++ = pixel[0];
             *dp++ = pixel[1];
             *dp++ = pixel[2]; } }
@@ -101,9 +107,10 @@ int main(int argc, char** argv)
 
     // Read the command line argument
     std::string inName =  (argc > 1) ? argv[1] : "testscene.scn";
+    std::string baseName = inName.substr(0, inName.size() - 4) + "_";
     std::string hdrName = inName;
 
-    hdrName.replace(hdrName.size()-3, hdrName.size(), "hdr");
+    hdrName.replace(hdrName.size()-4, hdrName.size(), "_final.hdr");
 
     // Read the scene, calling scene.Command for each line.
     ReadScene(inName, scene);
@@ -116,10 +123,25 @@ int main(int argc, char** argv)
         for (int x=0;  x<scene->width;  x++)
             image[y*scene->width + x] = Color(0,0,0);
 
-    // RayTrace the image
-    scene->TraceImage(image, 1);
+    const uint32 numPasses = (argc > 2) ? uint32(std::atoi(argv[2])) : 8;
 
+    for (uint32 i = 1; i <= numPasses; ++i)
+    {
+        // RayTrace the image
+        scene->TraceImage(image, i);
+
+        //if (i % 10 == 0 && i != 0)
+        if (i == 1 || i == 8 || i == 64 || i == 512)
+        {
+            // Write the image
+            fprintf(stderr, "Writing image...\n");
+            WriteHdrImage(baseName + std::to_string(i) + ".hdr", scene->width, scene->height, image, float(i));
+            fprintf(stderr, "Finished.\n");
+        }
+    }
     // Write the image
-    WriteHdrImage(hdrName, scene->width, scene->height, image);
+    fprintf(stderr, "Writing image...\n");
+    WriteHdrImage(hdrName, scene->width, scene->height, image, float(numPasses));
+    fprintf(stderr, "Finished.\n");
 
 }

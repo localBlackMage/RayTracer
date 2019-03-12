@@ -7,7 +7,7 @@ Interval SlabIntersect(const RTSlab & a_Slab, const Ray& a_Ray)
     const Vector3f& S = a_Ray.Origin();
 
     interval.m_vNormal0 = a_Slab.m_vNormal;
-    interval.m_vNormal1 = a_Slab.m_vNormal;
+    interval.m_vNormal1 = -a_Slab.m_vNormal;
 
     float nDotD = a_Slab.m_vNormal.dot(D);
     float nDotS = a_Slab.m_vNormal.dot(S);

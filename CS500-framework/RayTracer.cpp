@@ -30,6 +30,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
         }
         else
         {
+            Vector3f omegaO = (-a_Ray.Direction()).normalized();
             while (MersenneRandFloat() <= RUSSIAN_ROULETTE)
             {
                 Vector3f omegaI;
@@ -47,20 +48,20 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                     I.m_vPoint.isApprox(L.m_vPoint) && 
                     I.m_pShape == L.m_pShape)
                 {
-                    f = P.m_pMaterial->EvalScattering(P.m_vNormal, omegaI);
+                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
                     C += W * (f / p) * static_cast<Light*>(L.m_pMaterial)->Radiance();
                 }
 #pragma endregion
 
 #pragma region Extend Path
-                omegaI = P.m_pMaterial->SampleBRDF(P.m_vNormal);
-                Ray extendedRay = Ray(P.m_vPoint, omegaI); // + (omegaI * EPSILON)
+                omegaI = P.m_pMaterial->SampleBRDF(omegaO, P.m_vNormal);
+                Ray extendedRay = Ray(P.m_vPoint, omegaI); /// + (omegaI * EPSILON)
 
                 if (!m_pWorld->Hit(extendedRay, Q))
                     break;
 
-                f = P.m_pMaterial->EvalScattering(P.m_vNormal, omegaI);
-                p = P.m_pMaterial->PdfBRDF(P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
+                p = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
                 if (p < EPSILON)
                     break; // avoid division by 0
                 W = W * (f / p);
@@ -76,6 +77,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 
                 // Step Forward
                 P = Q;
+                omegaO = -omegaI;
             }
             return C;
         }
@@ -93,7 +95,7 @@ RayTracer::RayTracer() :
     m_pCamera(nullptr),
     m_pWorld(new ShapeList()),
     m_pLights(new ShapeList()),
-    m_fNumRaysPerPixel(64.f)
+    m_fNumRaysPerPixel(8.f)
 {
 }
 
@@ -162,20 +164,14 @@ void RayTracer::Finish()
 Color RayTracer::GetColor(uint32 i, uint32 j)
 {
     Color color(0, 0, 0);
-    uint32 ns = uint32(m_fNumRaysPerPixel);
     float nx = float(m_uScreenWidth - 1);
     float ny = float(m_uScreenHeight - 1);
     float halfWidth = float(m_uScreenWidth) * 0.5f;
     float halfHeight = float(m_uScreenHeight) * 0.5f;
 
-    for (uint32 s = 0; s < ns; ++s)
-    {
-        float x = 2.f * (float(i) + MersenneRandFloat() - halfWidth) / nx;
-        float y = 2.f * (float(j) + MersenneRandFloat() - halfHeight) / ny;
+    float x = 2.f * (float(i) + MersenneRandFloat() - halfWidth) / nx;
+    float y = 2.f * (float(j) + MersenneRandFloat() - halfHeight) / ny;
 
-        Ray ray = m_pCamera->GetRay(x, y);
-        color += PathTrace(ray, 0);
-    }
-
-    return color / m_fNumRaysPerPixel;
+    Ray ray = m_pCamera->GetRay(x, y);
+    return PathTrace(ray, 0);
 }

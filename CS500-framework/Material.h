@@ -14,18 +14,12 @@ enum eMaterialType : uint32
 class Material
 {
 protected:
-    //Color LambertianScatter(const Ray& a_RayIn, const Intersection& a_HitData);
-    //Color MetalScatter(const Ray& a_RayIn, const Intersection& a_HitData);
-    //
-    //Color (*m_pScatterFunctions[eMaterialType_MAX])(const Ray& a_RayIn, const Intersection& a_HitData) = {
-    //    &this->LambertianScatter,
-    //    &this->MetalScatter
-    //};
+    Color LambertianScatter(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    Color MetalScatter(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 
-    Color LambertianScatter(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
-    Color MetalScatter(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
+    Color(Material::*m_pScatterFunctions[eMaterialType_MAX])(const Vector3f &, const Vector3f &, const Vector3f &);
 
-    Color(Material::*m_pScatterFunctions[eMaterialType_MAX])(const Vector3f & a_vNormal, const Vector3f & a_vOmega);
+    float Pd, Pr, S, m_fRoughnessExponent;
 
     void Initialize();
 public:
@@ -47,9 +41,9 @@ public:
     {
         Initialize();
     }
-    Material(const Color d, const Color s, const float a, eMaterialType a_eMatType = eMaterialType_Lambertian, bool a_bIsLight = false) :
+    Material(const Color d, const Color s, const float a, bool a_bIsLight = false) :
         Kd(d), Ks(s), alpha(a), texid(0),
-        eMatType(a_eMatType),
+        eMatType(eMaterialType_Lambertian),
         m_bIsLight(a_bIsLight)
     {
         Initialize();
@@ -61,12 +55,12 @@ public:
     //virtual void apply(const unsigned int program);
 
     //Color EvalScattering(const Ray& a_RayIn, const Intersection& a_HitData) const;
-    Color EvalScattering(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
+    Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 
-    float PdfBRDF(const Vector3f& a_vNormal, const Vector3f& a_vOmega);
+    float PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 
     // Returns omega sub i
-    Vector3f SampleBRDF(const Vector3f& a_vNormal);
+    Vector3f SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal);
 };
 
 ////////////////////////////////////////////////////////////////////////

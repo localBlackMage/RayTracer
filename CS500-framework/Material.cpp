@@ -20,12 +20,12 @@
 //    return Color(0,0,0);
 //}
 
-Color Material::LambertianScatter(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
+Color Material::LambertianScatter(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    return fabsf(a_vNormal.dot(a_vOmega)) * (Kd / PI);
+    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Kd / PI);
 }
 
-Color Material::MetalScatter(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
+Color Material::MetalScatter(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
     return Color(0, 0, 0);
 }
@@ -34,6 +34,12 @@ void Material::Initialize()
 {
     m_pScatterFunctions[eMaterialType_Lambertian] = &Material::LambertianScatter;
     m_pScatterFunctions[eMaterialType_Metal] = &Material::MetalScatter;
+
+    S = Vector3f(Kd).norm() + Vector3f(Ks).norm();
+    Pd = Vector3f(Kd).norm() / S;
+    Pr = Vector3f(Ks).norm() / S;
+
+    m_fRoughnessExponent = 1.f / (alpha + 1.f);
 }
 
 void Material::setTexture(const std::string path)
@@ -57,20 +63,57 @@ void Material::setTexture(const std::string path)
     //stbi_image_free(image);
 }
 
-Color Material::EvalScattering(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
+Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    return (this->*m_pScatterFunctions[eMatType])(a_vNormal, a_vOmega);
+    //return (this->*m_pScatterFunctions[eMatType])(a_vOmegaO, a_vNormal, a_vOmegaI);
+
+    Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
+    Color Ed = (Kd / PI), Er;
+    float DTerm = BRDF_D(m, a_vNormal, alpha);
+    float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+    Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
+    float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
+    if (denom == 0.f)
+    {
+        Er = Color(0, 0, 0);
+    }
+    else
+    {
+        Er = (DTerm * GTerm * FTerm) / denom;
+    }
+
+    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er);
 }
 
-float Material::PdfBRDF(const Vector3f & a_vNormal, const Vector3f & a_vOmega)
+float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    return fabsf(a_vNormal.dot(a_vOmega) / PI);
+    Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
+
+    // Diffusion
+    float newPD = fabsf(a_vNormal.dot(a_vOmegaI) / PI);
+
+    // Reflection
+    float DTerm = BRDF_D(m, a_vNormal, alpha);
+    float newPR = DTerm * (m.dot(a_vNormal)) * (1.f / (4.f * fabsf(a_vOmegaI.dot(m))));
+
+    return Pd * newPD + Pr * newPR;
 }
 
-Vector3f Material::SampleBRDF(const Vector3f& a_vNormal)
+Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal)
 {
+    float phi = MersenneRandFloat();
     float a = MersenneRandFloat();
     float b = MersenneRandFloat();
-    
-    return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b).normalized();
+
+    // Diffusion
+    if (phi < Pd)
+    {
+        return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b).normalized();
+    }
+    // Reflection
+    else /*if (phi < Ps)*/
+    {
+        Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
+        return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO;
+    }
 }

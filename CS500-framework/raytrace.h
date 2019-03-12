@@ -36,5 +36,5 @@ public:
 
     // The main program will call the TraceImage method to generate
     // and return the image.  This is the Ray Tracer!
-    void TraceImage(Color* image, const int pass);
+    void TraceImage(Color* image, const uint32 pass);
 };
