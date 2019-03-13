@@ -146,8 +146,16 @@ void Scene::TraceImage(Color* image, const uint32 pass)
         //fprintf(stderr, "Rendering %4d\r", y);
         for (int x = 0; x < width; x++) {
             Color c = m_pRayTracer->GetColor(x, y);
-            if (isnan(c[0]) || isinf(c[0]) || isnan(c[1]) || isinf(c[1]) || isnan(c[2]) || isinf(c[2]))
+            if (IsColorNAN(c))
+            {
+                std::cout << "NAN" << std::endl;
                 c = Color(0, 0, 0);
+            }
+            if (IsColorINF(c))
+            { 
+                std::cout << "INF" << std::endl;
+                c = Color(0, 0, 0);
+            }
             image[y*width + x] += c;
         }
     }

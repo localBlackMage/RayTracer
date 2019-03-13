@@ -36,7 +36,6 @@ bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection &
         if (t1 < EPSILON && t2 < EPSILON)
             return false;
 
-        float t;
         if (t1 < 0 || t2 < 0)
             a_Hit.m_fT = std::max(t1, t2);
         else

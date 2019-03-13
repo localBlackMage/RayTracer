@@ -73,16 +73,25 @@ Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNo
     float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
     Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
     float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
-    if (denom == 0.f)
+    if (AreSimilar( denom, 0.f))
     {
         Er = Color(0, 0, 0);
     }
     else
     {
+        if (isnan(DTerm))
+            std::cout << "DTerm is NAN" << std::endl;
+        if (isnan(GTerm))
+            std::cout << "GTerm is NAN" << std::endl;
+        if (IsColorNAN(FTerm))
+            std::cout << "FTerm is NAN" << std::endl;
         Er = (DTerm * GTerm * FTerm) / denom;
     }
 
-    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er);
+    Color returnColor = fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er);
+    if (IsColorNAN(returnColor))
+        std::cout << "returnColor is NAN" << std::endl;
+    return returnColor;
 }
 
 float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
@@ -95,6 +104,9 @@ float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, c
     // Reflection
     float DTerm = BRDF_D(m, a_vNormal, alpha);
     float newPR = DTerm * (m.dot(a_vNormal)) * (1.f / (4.f * fabsf(a_vOmegaI.dot(m))));
+
+    if (isnan(newPR))
+        newPR = 0.f;
 
     return Pd * newPD + Pr * newPR;
 }

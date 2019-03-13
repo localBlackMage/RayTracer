@@ -23,6 +23,8 @@ Vector3f Reflect(const Vector3f& a_vA, const Vector3f& a_vB);
 
 bool AreSameSign(const float& a_fA, const float& a_fB);
 
+bool AreSimilar(float a_fA, float a_fB);
+
 template <typename T>
 void SwapValues(T& a_A, T& a_B)
 {
@@ -45,5 +47,11 @@ float BRDF_D(const Vector3f& a_vM, const Vector3f& a_vNormal, float a_fAlpha);
 float BRDF_G(const Vector3f& a_vOmegaO, const Vector3f& a_vOmegaI, const Vector3f& a_vM, const Vector3f& a_vNormal, float a_fAlpha);
 
 Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs);
+
+
+
+bool IsColorNAN(const Color& a_cColor);
+
+bool IsColorINF(const Color& a_cColor);
 
 #endif

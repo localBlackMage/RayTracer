@@ -10,6 +10,11 @@ bool AreSameSign(const float & a_fA, const float & a_fB)
     return (a_fA >= 0.f && a_fB >= 0.f) || (a_fA < 0.f && a_fB < 0.f);
 }
 
+bool AreSimilar(float a_fA, float a_fB)
+{
+    return fabsf(fabsf(a_fA) - fabsf(a_fB)) <= EPSILON;
+}
+
 float GetDValueForPlane(const Vector3f & a_vNormal, const Vector3f & a_vPoint)
 {
     return -a_vNormal.x() * a_vPoint.x() - a_vNormal.y() * a_vPoint.y() - a_vNormal.z() * a_vPoint.z();
@@ -132,6 +137,16 @@ Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
 {
     // F(L, H) = Ks + (1.f - Ks) *  pow(1.f - L.dot(H), 5)
     return a_cKs + (Color(1, 1, 1) + a_cKs) * pow(1.f - a_vL.dot(a_vH), 5);
+}
+
+bool IsColorNAN(const Color & a_cColor)
+{
+    return isnan(a_cColor[0]) || isnan(a_cColor[1]) || isnan(a_cColor[2]);
+}
+
+bool IsColorINF(const Color & a_cColor)
+{
+    return isinf(a_cColor[0]) || isinf(a_cColor[1]) || isinf(a_cColor[2]);
 }
 
 float cot(float val)
