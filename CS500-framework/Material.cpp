@@ -35,7 +35,7 @@ void Material::Initialize()
     m_pScatterFunctions[eMaterialType_Lambertian] = &Material::LambertianScatter;
     m_pScatterFunctions[eMaterialType_Metal] = &Material::MetalScatter;
 
-    S = Vector3f(Kd).norm() + Vector3f(Ks).norm();
+    S = Vector3f(Kd).norm() + Vector3f(Ks).norm() + Vector3f(Kt).norm();
     Pd = Vector3f(Kd).norm() / S;
     Pr = Vector3f(Ks).norm() / S;
     Pt = Vector3f(Kt).norm() / S;
@@ -124,9 +124,22 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
         return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b).normalized();
     }
     // Reflection
-    else /*if (phi < Ps)*/
+    else if (phi < Pr)
     {
         Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
-        return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO;
+        return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO; // omegaI
+    }
+    // Transmission
+    else /*if (phi < Pt)*/
+    {
+        Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
+        float oDotM = a_vOmegaO.dot(m);
+        float r = 1 - eta * eta * (1.f - (oDotM * oDotM));
+
+        // Total internal refraction
+        if (r < 0.f)
+        {
+            return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO; // omegaI
+        }
     }
 }
