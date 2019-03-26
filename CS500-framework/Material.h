@@ -19,12 +19,12 @@ protected:
 
     Color(Material::*m_pScatterFunctions[eMaterialType_MAX])(const Vector3f &, const Vector3f &, const Vector3f &);
 
-    float Pd, Pr, S, m_fRoughnessExponent;
+    float Pd, Pr, Pt, S, m_fRoughnessExponent;
 
     void Initialize();
 public:
-    Color Kd, Ks;
-    float alpha;
+    Color Kd, Ks, Kt;
+    float alpha, m_IOR;
     unsigned int texid;
     eMaterialType eMatType;
     bool m_bIsLight;
@@ -34,21 +34,23 @@ public:
     Material() : 
         Kd(Color(1.0, 0.5, 0.0)), 
         Ks(Color(1, 1, 1)),
-        alpha(1.0), 
+        Kt(Color(1, 1, 1)),
+        alpha(1.f), 
+        m_IOR(1.f),
         texid(0),
         eMatType(eMaterialType_Lambertian),
         m_bIsLight(false)
     {
         Initialize();
     }
-    Material(const Color d, const Color s, const float a, bool a_bIsLight = false) :
-        Kd(d), Ks(s), alpha(a), texid(0),
+    Material(const Color d, const Color s, const Color t, const float a, const float ior, bool a_bIsLight = false) :
+        Kd(d), Ks(s), Kt(t), alpha(a), m_IOR(ior), texid(0),
         eMatType(eMaterialType_Lambertian),
         m_bIsLight(a_bIsLight)
     {
         Initialize();
     }
-    Material(Material& o) { Kd = o.Kd;  Ks = o.Ks;  alpha = o.alpha;  texid = o.texid; eMatType = o.eMatType; m_bIsLight = o.m_bIsLight; Initialize(); }
+    Material(Material& o) { Kd = o.Kd;  Ks = o.Ks; Kt = o.Kt; alpha = o.alpha; m_IOR = o.m_IOR; texid = o.texid; eMatType = o.eMatType; m_bIsLight = o.m_bIsLight; Initialize(); }
     virtual ~Material() {};
 
     void setTexture(const std::string path);
