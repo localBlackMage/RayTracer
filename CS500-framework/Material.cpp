@@ -38,6 +38,7 @@ void Material::Initialize()
     S = Vector3f(Kd).norm() + Vector3f(Ks).norm();
     Pd = Vector3f(Kd).norm() / S;
     Pr = Vector3f(Ks).norm() / S;
+    Pt = Vector3f(Kt).norm() / S;
 
     m_fRoughnessExponent = 1.f / (alpha + 1.f);
 }
@@ -79,18 +80,18 @@ Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNo
     }
     else
     {
-        if (isnan(DTerm))
-            std::cout << "DTerm is NAN" << std::endl;
-        if (isnan(GTerm))
-            std::cout << "GTerm is NAN" << std::endl;
-        if (IsColorNAN(FTerm))
-            std::cout << "FTerm is NAN" << std::endl;
+        //if (isnan(DTerm))
+        //    std::cout << "DTerm is NAN" << std::endl;
+        //if (isnan(GTerm))
+        //    std::cout << "GTerm is NAN" << std::endl;
+        //if (IsColorNAN(FTerm))
+        //    std::cout << "FTerm is NAN" << std::endl;
         Er = (DTerm * GTerm * FTerm) / denom;
     }
 
     Color returnColor = fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er);
-    if (IsColorNAN(returnColor))
-        std::cout << "returnColor is NAN" << std::endl;
+    //if (IsColorNAN(returnColor))
+    //    std::cout << "returnColor is NAN" << std::endl;
     return returnColor;
 }
 

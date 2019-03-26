@@ -83,12 +83,14 @@ void Scene::Command(const std::vector<std::string>& strings,
     }
 
     else if (c == "brdf")  {
+        //         0     1 2 3   4 5 6  7      8 9 10 11
+        //               diffuse spec   alpha  trans  ior
         // syntax: brdf  r g b   r g b  alpha
-        // later:  brdf  r g b   r g b  alpha  r g b ior
+        // later:  brdf  r g b   r g b  alpha  r g b  ior
         // First rgb is Diffuse reflection, second is specular reflection.
         // third is beer's law transmission followed by index of refraction.
         // Creates a Material instance to be picked up by successive shapes
-        currentMat = new Material(Color(f[1], f[2], f[3]), Color(f[4], f[5], f[6]), f[7]); 
+        currentMat = new Material(Color(f[1], f[2], f[3]), Color(f[4], f[5], f[6]), Color(f[8], f[9], f[10]), f[7], f[11]);
     }
 
     else if (c == "light") {

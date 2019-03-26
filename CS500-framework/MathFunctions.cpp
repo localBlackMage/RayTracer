@@ -100,7 +100,7 @@ float BRDF_G1(const Vector3f & a_vV, const Vector3f & a_vM, const Vector3f& a_vN
 
 #if PHONG_G
     float vDotN = a_vV.dot(a_vNormal);
-    if (vDotN == 0.f)
+    if (vDotN <= EPSILON)
         return 0.f;
     if (vDotN > 1.f)
         return 1.f;
@@ -136,7 +136,7 @@ float BRDF_G(const Vector3f & a_vOmegaO, const Vector3f & a_vOmegaI, const Vecto
 Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
 {
     // F(L, H) = Ks + (1.f - Ks) *  pow(1.f - L.dot(H), 5)
-    return a_cKs + (Color(1, 1, 1) + a_cKs) * pow(1.f - a_vL.dot(a_vH), 5);
+    return a_cKs + (Color(1, 1, 1) - a_cKs) * pow(1.f - a_vL.dot(a_vH), 5);
 }
 
 bool IsColorNAN(const Color & a_cColor)
