@@ -49,7 +49,7 @@ float BRDF_G(const Vector3f& a_vOmegaO, const Vector3f& a_vOmegaI, const Vector3
 Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs);
 
 
-float Sign(float a_fVal);
+float SignFN(float a_fVal);
 
 
 bool IsColorNAN(const Color& a_cColor);

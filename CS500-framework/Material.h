@@ -11,6 +11,12 @@ enum eMaterialType : uint32
     eMaterialType_MAX
 };
 
+enum eDirection : uint32 {
+    eDirection_InsideToOutside = 0,
+    eDirection_OutsideToInside,
+    eDirection_Parallel
+};
+
 class Material
 {
 protected:
@@ -22,6 +28,11 @@ protected:
     float Pd, Pr, Pt, S, m_fRoughnessExponent;
 
     void Initialize();
+    void Eta(eDirection a_Direction, float& a_fEtaI, float& a_fEtaO);
+
+    Color Diffuse();
+    Color Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
+    Color Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
 public:
     Color Kd, Ks, Kt;
     float alpha, m_IOR;

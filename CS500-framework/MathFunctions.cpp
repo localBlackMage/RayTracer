@@ -139,7 +139,7 @@ Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
     return a_cKs + (Color(1, 1, 1) - a_cKs) * pow(1.f - a_vL.dot(a_vH), 5);
 }
 
-float Sign(float a_fVal)
+float SignFN(float a_fVal)
 {
     return (a_fVal >= 0.f) ? 1.f : -1.f;
 }
