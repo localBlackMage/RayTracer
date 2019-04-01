@@ -48,7 +48,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                     I.m_vPoint.isApprox(L.m_vPoint) && 
                     I.m_pShape == L.m_pShape)
                 {
-                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
+                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, I.m_fT);
                     Color explicitRadiance = W * (f / p) * static_cast<Light*>(L.m_pMaterial)->Radiance();
                     C += explicitRadiance;
                 }
@@ -61,7 +61,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (!m_pWorld->Hit(extendedRay, Q))
                     break;
 
-                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
+                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, Q.m_fT);
                 //if (IsColorNAN(f))
                 //    std::cout << "Extend path f is NAN" << std::endl;
                 p = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;

@@ -150,12 +150,12 @@ void Scene::TraceImage(Color* image, const uint32 pass)
             Color c = m_pRayTracer->GetColor(x, y);
             if (IsColorNAN(c))
             {
-                std::cout << "NAN" << std::endl;
+                std::cout << "Final Color is NAN" << std::endl;
                 c = Color(0, 0, 0);
             }
             if (IsColorINF(c))
             { 
-                std::cout << "INF" << std::endl;
+                std::cout << "Final Color is INF" << std::endl;
                 c = Color(0, 0, 0);
             }
             image[y*width + x] += c;
