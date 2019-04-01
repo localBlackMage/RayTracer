@@ -29,10 +29,11 @@ protected:
 
     void Initialize();
     void Eta(eDirection a_Direction, float& a_fEtaI, float& a_fEtaO);
+    Color Attenuation(float a_fT, const Vector3f& a_vOmegaO, const Vector3f & a_vNormal);
 
     Color Diffuse();
     Color Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
-    Color Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
+    Color Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT);
 public:
     Color Kd, Ks, Kt;
     float alpha, m_IOR;
@@ -67,8 +68,7 @@ public:
     void setTexture(const std::string path);
     //virtual void apply(const unsigned int program);
 
-    //Color EvalScattering(const Ray& a_RayIn, const Intersection& a_HitData) const;
-    Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI, float a_fT);
 
     float PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 

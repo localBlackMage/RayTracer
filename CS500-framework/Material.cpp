@@ -52,7 +52,7 @@ void Material::Initialize()
     m_pScatterFunctions[eMaterialType_Lambertian] = &Material::LambertianScatter;
     m_pScatterFunctions[eMaterialType_Metal] = &Material::MetalScatter;
 
-    S = Vector3f(Kd).norm() + Vector3f(Ks).norm() + Vector3f(Kt).norm();
+    S = Vector3f(Kd).norm() + Vector3f(Ks).norm();// +Vector3f(Kt).norm();
     Pd = Vector3f(Kd).norm() / S;
     Pr = Vector3f(Ks).norm() / S;
     Pt = Vector3f(Kt).norm() / S;
@@ -86,6 +86,23 @@ void Material::Eta(eDirection a_Direction, float& a_fEtaI, float& a_fEtaO)
     }
 }
 
+Color Material::Attenuation(float a_fT, const Vector3f& a_vOmegaO, const Vector3f & a_vNormal)
+{
+    float omegaODotN = a_vOmegaO.dot(a_vNormal);
+    if (omegaODotN < 0.f)
+    {
+        float r = pow(MATH_E, a_fT * log(Kt[0]));
+        float g = pow(MATH_E, a_fT * log(Kt[1]));
+        float b = pow(MATH_E, a_fT * log(Kt[2]));
+
+        return Color(r, g, b);
+    }
+    else
+    {
+        return Color(1, 1, 1);
+    }
+}
+
 Color Material::Diffuse()
 {
     return (Kd / PI);
@@ -114,7 +131,7 @@ Color Material::Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal
     }
 }
 
-Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
+Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT)
 {
     eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
     float etaI, etaO;
@@ -124,8 +141,45 @@ Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNorm
     float omegaODotM = a_vOmegaO.dot(m);
     // radicand = 1 - eta^2 * (1 - (omegaO dot m)^2)
     float radicand = 1 - (eta * eta) * (1 - (omegaODotM * omegaODotM));
+    Color ATerm = Attenuation(a_fT, a_vOmegaO, a_vNormal); // Beer's Law = Attenuation factor A(t)
 
-    return Color();
+    // Total Internal Reflection
+    if (radicand < 0)
+    {
+        m = (a_vOmegaO + a_vOmegaI).normalized();
+        float DTerm = BRDF_D(m, a_vNormal, alpha);
+        float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+        Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
+        float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
+        if (AreSimilar(denom, 0.f))
+        {
+            return Color(0, 0, 0);
+        }
+        else
+        {
+            return ATerm * (DTerm * GTerm * FTerm) / denom;
+        }
+    }
+    // Normal Transmission
+    else
+    {
+        float DTerm = BRDF_D(m, a_vNormal, alpha);
+        float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+        Color FTerm = 1.f - BRDF_F(a_vOmegaI, m, Ks);
+        float denom = fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
+        float RightTermNum = fabsf(a_vOmegaI.dot(m)) * fabsf(a_vOmegaO.dot(m)) * etaO * etaO;
+        float RightTermDenom = etaO * a_vOmegaI.dot(m) + etaI * a_vOmegaO.dot(m);
+        RightTermDenom *= RightTermDenom;
+
+        if (AreSimilar(denom, 0.f) || AreSimilar(RightTermDenom, 0.f))
+        {
+            return Color(0, 0, 0);
+        }
+        else
+        {
+            return ATerm * (DTerm * GTerm * FTerm) / denom * (RightTermNum / RightTermDenom);
+        }
+    }
 }
 
 void Material::setTexture(const std::string path)
@@ -149,13 +203,20 @@ void Material::setTexture(const std::string path)
     //stbi_image_free(image);
 }
 
-Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
+Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT)
 {
     Color Ed = Diffuse();
     Color Er = Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
-    Color Et = Transmission(a_vOmegaO, a_vNormal, a_vOmegaI);
+    //Color Et = Transmission(a_vOmegaO, a_vNormal, a_vOmegaI, a_fT);
 
-    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er);
+    if (IsColorNAN(Ed))
+        std::cout << "Diffuse is NAN" << std::endl;
+    if (IsColorNAN(Er))
+        std::cout << "Reflection is NAN" << std::endl;
+    //if (IsColorNAN(Et))
+    //    std::cout << "Transmission is NAN" << std::endl;
+
+    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er/* + Et*/);
 }
 
 float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
@@ -173,33 +234,33 @@ float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, c
     if (isnan(newPR))
         newPR = 0.f;
 
-    // Transmission
-    eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
-    float etaI, etaO;
-    Eta(direction, etaI, etaO);
-    float eta = etaI / etaO;
+    //// Transmission
+    //eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
+    //float etaI, etaO;
+    //Eta(direction, etaI, etaO);
+    //float eta = etaI / etaO;
 
-    m = (-(etaO * a_vOmegaI + etaI * a_vOmegaO)).normalized();
-    float omegaODotM = a_vOmegaO.dot(m);
-    // radicand = 1 - eta^2 * (1 - (omegaO dot m)^2)
-    float radicand = 1 - (eta * eta) * (1 - (omegaODotM * omegaODotM));
-    float newPt = 0.f;
-    // Total Internal Reflection
-    if (radicand < 0.f)
-    {
-        m = halfVector;
-        newPt = BRDF_D(m, a_vNormal, alpha) * fabsf(a_vNormal.dot(m)) * (1.f / (4.f * fabsf(a_vOmegaI.dot(m))));
-    }
-    // Normal transmission
-    else
-    {
-        float numerator = etaO * etaO * fabsf(a_vOmegaI.dot(m));
-        float denominator = (etaO * a_vOmegaI.dot(m) + etaI * a_vOmegaO.dot(m));
-        denominator *= denominator;
-        newPt = BRDF_D(m, a_vNormal, alpha) * fabsf(a_vNormal.dot(m)) * (numerator / denominator);
-    }
+    //m = (-(etaO * a_vOmegaI + etaI * a_vOmegaO)).normalized();
+    //float omegaODotM = a_vOmegaO.dot(m);
+    //// radicand = 1 - eta^2 * (1 - (omegaO dot m)^2)
+    //float radicand = 1 - (eta * eta) * (1 - (omegaODotM * omegaODotM));
+    //float newPt = 0.f;
+    //// Total Internal Reflection
+    //if (radicand < 0.f)
+    //{
+    //    m = halfVector;
+    //    newPt = BRDF_D(m, a_vNormal, alpha) * fabsf(a_vNormal.dot(m)) * (1.f / (4.f * fabsf(a_vOmegaI.dot(m))));
+    //}
+    //// Normal transmission
+    //else
+    //{
+    //    float numerator = etaO * etaO * fabsf(a_vOmegaI.dot(m));
+    //    float denominator = (etaO * a_vOmegaI.dot(m) + etaI * a_vOmegaO.dot(m));
+    //    denominator *= denominator;
+    //    newPt = BRDF_D(m, a_vNormal, alpha) * fabsf(a_vNormal.dot(m)) * (numerator / denominator);
+    //}
 
-    return Pd * newPD + Pr * newPR + Pt * newPt;
+    return Pd * newPD + Pr * newPR;// +Pt * newPt;
 }
 
 Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal)
@@ -214,30 +275,30 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
         return SampleLobe(a_vNormal, sqrtf(a), PI_2 * b).normalized();
     }
     // Reflection
-    else if (phi < Pr)
+    else// if (phi < Pr)
     {
         Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
         return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO; // omegaI
     }
     // Transmission
-    else /*if (phi < Pt)*/
-    {
-        Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
-        float oDotM = a_vOmegaO.dot(m);
-        eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
-        float etaI, etaO;
-        Eta(direction, etaI, etaO);
-        float eta = etaI / etaO;
-        float r = 1 - eta * eta * (1.f - (oDotM * oDotM));
+    //else /*if (phi < Pt)*/
+    //{
+    //    Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
+    //    float oDotM = a_vOmegaO.dot(m);
+    //    eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
+    //    float etaI, etaO;
+    //    Eta(direction, etaI, etaO);
+    //    float eta = etaI / etaO;
+    //    float r = 1 - eta * eta * (1.f - (oDotM * oDotM));
 
-        // Total internal refraction
-        if (r < 0.f)
-        {
-            return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO; // omegaI
-        }
-        else
-        {
-            return  (eta * a_vOmegaO.dot(m) - SignFN(a_vOmegaO.dot(a_vNormal)) * sqrtf(r)) * m - eta * a_vOmegaO;
-        }
-    }
+    //    // Total internal refraction
+    //    if (r < 0.f)
+    //    {
+    //        return 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO; // omegaI
+    //    }
+    //    else
+    //    {
+    //        return  (eta * a_vOmegaO.dot(m) - SignFN(a_vOmegaO.dot(a_vNormal)) * sqrtf(r)) * m - eta * a_vOmegaO;
+    //    }
+    //}
 }
