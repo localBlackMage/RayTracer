@@ -34,6 +34,10 @@ protected:
     Color Diffuse();
     Color Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
     Color Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT);
+
+    float PDFDiffuse(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    float PDFReflection(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI, const Vector3f& a_vM);
+    float PDFTransmission(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 public:
     Color Kd, Ks, Kt;
     float alpha, m_IOR;

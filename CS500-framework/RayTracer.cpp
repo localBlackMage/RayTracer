@@ -62,32 +62,18 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                     break;
 
                 f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, Q.m_fT);
-                //if (IsColorNAN(f))
-                //    std::cout << "Extend path f is NAN" << std::endl;
                 p = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
                 if (p < EPSILON)
                 {
                     break; // avoid division by 0
                 }
-                //if (IsColorNAN(f))
-                //    std::cout << "f extend path is NAN" << std::endl;
-                //if (isnan(p))
-                //    std::cout << "p extend path is NAN" << std::endl;
                 W = W * (f / p);
-                //if (IsColorNAN(W))
-                //{
-                //    std::cout << "W extend path is NAN" << std::endl;
-                //    if (IsColorNAN(f / p))
-                //        std::cout << "f / p extend path is NAN" << std::endl;
-                //}
 #pragma endregion
                 
 #pragma region Implicit Light connection
                 if (Q.m_pMaterial->isLight())
                 {
                     Color radiance = W * static_cast<Light*>(Q.m_pMaterial)->Radiance();
-                    //if (IsColorNAN(radiance))
-                    //    std::cout << "radiance is NAN" << std::endl;
                     C += radiance;
                     break;
                 }
