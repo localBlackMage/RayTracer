@@ -44,7 +44,7 @@ Vector3f SampleLobe(const Vector3f& a_vNormal, float c, float phi);
 
 float BRDF_D(const Vector3f& a_vM, const Vector3f& a_vNormal, float a_fAlpha);
 
-float BRDF_G(const Vector3f& a_vOmegaO, const Vector3f& a_vOmegaI, const Vector3f& a_vM, const Vector3f& a_vNormal, float a_fAlpha);
+float BRDF_G(const Vector3f& a_vOmegaI, const Vector3f& a_vOmegaO, const Vector3f& a_vM, const Vector3f& a_vNormal, float a_fAlpha);
 
 Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs);
 

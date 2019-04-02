@@ -9,15 +9,13 @@
 
 Scene::Scene() :
     m_pRayTracer(new RayTracer()),
-    currentMat(nullptr),
-    m_pStopWatch(new RTStopWatch())
+    currentMat(nullptr)
 { 
 }
 
 Scene::~Scene()
 {
     delete m_pRayTracer;
-    delete m_pStopWatch;
 }
 
 void Scene::Finit()
@@ -141,7 +139,6 @@ void Scene::Command(const std::vector<std::string>& strings,
 void Scene::TraceImage(Color* image, const uint32 pass)
 {
     fprintf(stderr, "Pass Number: %d\n", pass);
-    //m_pStopWatch->Reset();
     //fprintf(stderr, "\nNumObjects %d\n", m_pRayTracer->NumShapes());
 #pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
     for (int y = 0; y < height; y++) {
@@ -161,7 +158,4 @@ void Scene::TraceImage(Color* image, const uint32 pass)
             image[y*width + x] += c;
         }
     }
-    //fprintf(stderr, "Seconds: %d\n", m_pStopWatch->ElapsedInSec());
-    //fprintf(stderr, "Milliseconds: %d\n", m_pStopWatch->ElapsedInMs());
-    //fprintf(stderr, "Microseconds: %d\n", m_pStopWatch->ElapsedInUs());
 }

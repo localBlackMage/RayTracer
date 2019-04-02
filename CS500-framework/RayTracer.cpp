@@ -30,7 +30,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
         }
         else
         {
-            Vector3f omegaO = (-a_Ray.Direction()).normalized();
+            Vector3f omegaO = -(a_Ray.Direction().normalized());
             while (MersenneRandFloat() <= RUSSIAN_ROULETTE)
             {
                 Vector3f omegaI;
@@ -42,7 +42,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
                 // Cast the shadow ray
-                Ray explicitRay = Ray(P.m_vPoint, omegaI); ///* + (omegaI * EPSILON)*/
+                Ray explicitRay = Ray(P.m_vPoint, omegaI); // + (omegaI * EPSILON)
                 if (p > 0.f && 
                     m_pWorld->Hit(explicitRay, I) && 
                     I.m_vPoint.isApprox(L.m_vPoint) && 
@@ -86,11 +86,6 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 
             return C;
         }
-
-        //return hData.m_pMaterial->Kd;
-        //float depth = (hData.m_fT - 5.f) / 4.f;
-        //return Color(depth, depth, depth);
-        //return Vector3f(fabsf(hData.m_vNormal.x()), fabsf(hData.m_vNormal.y()), fabsf(hData.m_vNormal.z()));
     }
     // No intersection, return C as is
     return C;

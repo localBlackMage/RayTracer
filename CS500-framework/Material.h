@@ -20,11 +20,6 @@ enum eDirection : uint32 {
 class Material
 {
 protected:
-    Color LambertianScatter(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
-    Color MetalScatter(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
-
-    Color(Material::*m_pScatterFunctions[eMaterialType_MAX])(const Vector3f &, const Vector3f &, const Vector3f &);
-
     float Pd, Pr, Pt, S, m_fRoughnessExponent;
 
     void Initialize();
@@ -36,7 +31,7 @@ protected:
     Color Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT);
 
     float PDFDiffuse(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
-    float PDFReflection(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI, const Vector3f& a_vM);
+    float PDFReflection(const Vector3f & a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
     float PDFTransmission(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 public:
     Color Kd, Ks, Kt;

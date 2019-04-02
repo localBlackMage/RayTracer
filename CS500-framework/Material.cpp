@@ -63,21 +63,8 @@ void Material::Eta(eDirection a_Direction, float& a_fEtaI, float& a_fEtaO)
     }
 }
 
-Color Material::LambertianScatter(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
-{
-    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Kd / PI);
-}
-
-Color Material::MetalScatter(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
-{
-    return Color(0, 0, 0);
-}
-
 void Material::Initialize()
 {
-    m_pScatterFunctions[eMaterialType_Lambertian] = &Material::LambertianScatter;
-    m_pScatterFunctions[eMaterialType_Metal] = &Material::MetalScatter;
-
     S = Vector3f(Kd).norm() + Vector3f(Ks).norm() + Vector3f(Kt).norm();
     Pd = Vector3f(Kd).norm() / S;
     Pr = Vector3f(Ks).norm() / S;
@@ -121,12 +108,6 @@ Color Material::Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal
     }
     else
     {
-        //if (isnan(DTerm))
-        //    std::cout << "DTerm is NAN" << std::endl;
-        //if (isnan(GTerm))
-        //    std::cout << "GTerm is NAN" << std::endl;
-        //if (IsColorNAN(FTerm))
-        //    std::cout << "FTerm is NAN" << std::endl;
         return (DTerm * GTerm * FTerm) / denom;
     }
 }
@@ -149,7 +130,7 @@ Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNorm
     {
         m = (a_vOmegaO + a_vOmegaI).normalized();
         float DTerm = BRDF_D(m, a_vNormal, alpha);
-        float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+        float GTerm = BRDF_G(a_vOmegaI, a_vOmegaO, m, a_vNormal, alpha);
         Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
         float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
         if (AreSimilar(denom, 0.f))
@@ -166,7 +147,8 @@ Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNorm
     {
         float DTerm = BRDF_D(m, a_vNormal, alpha);
         float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
-        Color FTerm = Color(1.f, 1.f, 1.f) - BRDF_F(a_vOmegaI, m, Ks);
+        Color FColor = BRDF_F(a_vOmegaI, m, Ks);
+        Color FTerm = Color(1.f - FColor[0], 1.f - FColor[1], 1.f - FColor[2]);
         float denom = fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
         float RightTermNum = fabsf(a_vOmegaI.dot(m)) * fabsf(a_vOmegaO.dot(m)) * etaO * etaO;
         float RightTermDenom = etaO * a_vOmegaI.dot(m) + etaI * a_vOmegaO.dot(m);
@@ -188,10 +170,11 @@ float Material::PDFDiffuse(const Vector3f & a_vNormal, const Vector3f & a_vOmega
     return fabsf(a_vNormal.dot(a_vOmegaI) / PI);
 }
 
-float Material::PDFReflection(const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, const Vector3f& a_vM)
+float Material::PDFReflection(const Vector3f & a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    float DTerm = BRDF_D(a_vM, a_vNormal, alpha);
-    float newPR = DTerm * (a_vM.dot(a_vNormal)) * (1.f / (4.f * fabsf(a_vOmegaI.dot(a_vM))));
+    Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
+    float DTerm = BRDF_D(m, a_vNormal, alpha);
+    float newPR = DTerm * fabsf(m.dot(a_vNormal)) * (1.f / (4.f * fabsf(a_vOmegaI.dot(m))));
 
     if (isnan(newPR))
         newPR = 0.f;
@@ -271,33 +254,31 @@ Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNo
     Color Er = Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
     Color Et = Transmission(a_vOmegaO, a_vNormal, a_vOmegaI, a_fT);
 
-    if (IsColorNAN(Ed))
-        std::cout << "Diffuse is NAN" << std::endl;
-    if (IsColorNAN(Er))
-        std::cout << "Reflection is NAN" << std::endl;
-    if (IsColorNAN(Et))
-        std::cout << "Transmission is NAN" << std::endl;
+    //if (IsColorNAN(Ed))
+    //    std::cout << "Diffuse is NAN" << std::endl;
+    //if (IsColorINF(Er))
+    //    std::cout << "Reflection is INF" << std::endl;
+    //if (IsColorNAN(Et))
+    //    std::cout << "Transmission is NAN" << std::endl;
 
-    if (!AreSimilar(Et[0], 0.f) && !AreSimilar(Et[1], 0.f) && !AreSimilar(Et[2], 0.f))
-        std::cout << "Transmission " << std::endl;
+    //if (!AreSimilar(Et[0], 0.f) && !AreSimilar(Et[1], 0.f) && !AreSimilar(Et[2], 0.f))
+    //    std::cout << "Transmission " << std::endl;
 
-    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er + Et);
+    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er +Et);
 }
 
 float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
-
     // Diffusion
     float newPD = PDFDiffuse(a_vNormal, a_vOmegaI);
 
     // Reflection
-    float newPR = PDFReflection(a_vNormal, a_vOmegaI, m);
+    float newPR = PDFReflection(a_vOmegaO, a_vNormal, a_vOmegaI);
 
     // Transmission
-    float newPT = PDFTransmission(a_vOmegaO, a_vNormal, a_vOmegaI);
+    //float newPT = PDFTransmission(a_vOmegaO, a_vNormal, a_vOmegaI);
 
-    return Pd * newPD + Pr * newPR + Pt * newPT;
+    return Pd * newPD + Pr * newPR;// +Pt * newPT;
 }
 
 Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal)
@@ -319,7 +300,7 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
         omegaI = 2.f * (a_vOmegaO.dot(m)) * m - a_vOmegaO; // omegaI
     }
     // Transmission
-    else /*if (phi < Pt)*/
+    else //if (phi < Pt)
     {
         Vector3f m = SampleLobe(a_vNormal, powf(a, m_fRoughnessExponent), PI_2 * b).normalized();
         float oDotM = a_vOmegaO.dot(m);
@@ -342,6 +323,5 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
             omegaI = left * m - eta * a_vOmegaO;
         }
     }
-
     return omegaI;
 }

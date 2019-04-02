@@ -103,6 +103,7 @@ void WriteHdrImage(const std::string outName, const int width, const int height,
 ////////////////////////////////////////////////////////////////////////
 int main(int argc, char** argv)
 {
+    RTStopWatch* pStopWatch = new RTStopWatch();;
     Scene* scene = new Scene();
 
     // Read the command line argument
@@ -125,6 +126,7 @@ int main(int argc, char** argv)
 
     const uint32 numPasses = (argc > 2) ? uint32(std::atoi(argv[2])) : 8;
 
+    pStopWatch->Reset();
     for (uint32 i = 1; i <= numPasses; ++i)
     {
         // RayTrace the image
@@ -144,4 +146,9 @@ int main(int argc, char** argv)
     WriteHdrImage(hdrName, scene->width, scene->height, image, float(numPasses));
     fprintf(stderr, "Finished.\n");
 
+    fprintf(stderr, "Seconds: %d\n", pStopWatch->ElapsedInSec());
+    fprintf(stderr, "Milliseconds: %d\n", pStopWatch->ElapsedInMs());
+    fprintf(stderr, "Microseconds: %d\n", pStopWatch->ElapsedInUs());
+
+    delete pStopWatch;
 }

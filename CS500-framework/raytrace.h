@@ -16,7 +16,6 @@ public:
     //Realtime* realtime;         // Remove this (realtime stuff)
     RayTracer* m_pRayTracer;
     Material* currentMat;
-    RTStopWatch* m_pStopWatch;
 
     Scene();
     ~Scene();
