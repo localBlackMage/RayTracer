@@ -55,7 +55,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 #pragma endregion
 
 #pragma region Extend Path
-                omegaI = P.m_pMaterial->SampleBRDF(omegaO, P.m_vNormal);
+                omegaI = P.m_pMaterial->SampleBRDF(omegaO, P.m_vNormal).normalized();
                 Ray extendedRay = Ray(P.m_vPoint, omegaI); /// + (omegaI * EPSILON)
 
                 if (!m_pWorld->Hit(extendedRay, Q))

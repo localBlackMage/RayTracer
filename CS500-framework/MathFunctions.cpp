@@ -95,7 +95,10 @@ Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
 {
     // F(L, H) = Ks + (1.f - Ks) *  pow(1.f - L.dot(H), 5)
     Color OneMinusKs = Color(1.f - a_cKs[0], 1.f - a_cKs[1], 1.f - a_cKs[2]);
-    return a_cKs + OneMinusKs * pow(1.f - a_vL.dot(a_vH), 5);
+    float c = fabsf(a_vL.dot(a_vH));
+    float a = 1.f - c;
+    float b = pow(a, 5);
+    return a_cKs + OneMinusKs * b;
 }
 
 float SignFN(float a_fVal)

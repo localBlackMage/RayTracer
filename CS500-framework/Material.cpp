@@ -147,8 +147,21 @@ Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNorm
     {
         float DTerm = BRDF_D(m, a_vNormal, alpha);
         float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+        //if (AreSimilar(DTerm, 0.f))
+        //    std::cout << "DTerm is " << DTerm << std::endl;
+        //if (AreSimilar(GTerm, 0.f))
+        //    std::cout << "GTerm is " << GTerm << std::endl;
+
+
         Color FColor = BRDF_F(a_vOmegaI, m, Ks);
+
+        //if (!AreSimilar(Kt[0], 0.f) && !AreSimilar(Kt[1], 0.f) && !AreSimilar(Kt[2], 0.f))
+        //    std::cout << "Check" << std::endl;
+
         Color FTerm = Color(1.f - FColor[0], 1.f - FColor[1], 1.f - FColor[2]);
+        float sum = fabsf(FTerm[0]) + fabsf(FTerm[1]) + fabsf(FTerm[2]);/*
+        if (sum > 3.f)
+            std::cout << "FTerm out of range: \n" << FTerm << std::endl;*/
         float denom = fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
         float RightTermNum = fabsf(a_vOmegaI.dot(m)) * fabsf(a_vOmegaO.dot(m)) * etaO * etaO;
         float RightTermDenom = etaO * a_vOmegaI.dot(m) + etaI * a_vOmegaO.dot(m);
@@ -264,6 +277,11 @@ Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNo
     //if (!AreSimilar(Et[0], 0.f) && !AreSimilar(Et[1], 0.f) && !AreSimilar(Et[2], 0.f))
     //    std::cout << "Transmission " << std::endl;
 
+    //if (Et[0] < 0.f && Et[1] < 0.f && Et[2] < 0.f)
+    //    std::cout << "Et negative: " << Et << std::endl;
+    //else
+    //    std::cout << "Et: " << Et << std::endl;
+
     return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er +Et);
 }
 
@@ -276,9 +294,9 @@ float Material::PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, c
     float newPR = PDFReflection(a_vOmegaO, a_vNormal, a_vOmegaI);
 
     // Transmission
-    //float newPT = PDFTransmission(a_vOmegaO, a_vNormal, a_vOmegaI);
+    float newPT = PDFTransmission(a_vOmegaO, a_vNormal, a_vOmegaI);
 
-    return Pd * newPD + Pr * newPR;// +Pt * newPT;
+    return Pd * newPD + Pr * newPR + Pt * newPT;
 }
 
 Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal)
