@@ -140,7 +140,7 @@ void Scene::TraceImage(Color* image, const uint32 pass)
 {
     fprintf(stderr, "Pass Number: %d\n", pass);
     //fprintf(stderr, "\nNumObjects %d\n", m_pRayTracer->NumShapes());
-#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
+//#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
     for (int y = 0; y < height; y++) {
         //fprintf(stderr, "Rendering %4d\r", y);
         for (int x = 0; x < width; x++) {

@@ -39,6 +39,9 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 #pragma region Explicit light connection
                 m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
                 p = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
+                // Probability the explicit light could be chosen implicitly
+                float q = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                float wMis = (p * p) / (p * p + q * q);
                 omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
                 // Cast the shadow ray
@@ -49,7 +52,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                     I.m_pShape == L.m_pShape)
                 {
                     f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, I.m_fT);
-                    Color explicitRadiance = W * (f / p) * static_cast<Light*>(L.m_pMaterial)->Radiance();
+                    Color explicitRadiance = W * (f / p) * static_cast<Light*>(L.m_pMaterial)->Radiance() * wMis;
                     C += explicitRadiance;
                 }
 #pragma endregion
@@ -73,7 +76,10 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 #pragma region Implicit Light connection
                 if (Q.m_pMaterial->isLight())
                 {
-                    Color radiance = W * static_cast<Light*>(Q.m_pMaterial)->Radiance();
+                    // Probability the implicit light could be chosen explicitly
+                    p = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
+                    wMis = (p * p) / (p * p + q * q);
+                    Color radiance = W * static_cast<Light*>(Q.m_pMaterial)->Radiance() * wMis;
                     C += radiance;
                     break;
                 }
