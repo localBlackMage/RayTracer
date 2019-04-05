@@ -77,7 +77,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    p = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
+                    q = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
                     wMis = (p * p) / (p * p + q * q);
                     Color radiance = W * static_cast<Light*>(Q.m_pMaterial)->Radiance() * wMis;
                     C += radiance;

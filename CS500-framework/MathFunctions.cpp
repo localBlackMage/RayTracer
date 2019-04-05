@@ -48,7 +48,7 @@ float BRDF_TanTheta(const Vector3f & a_vA, const Vector3f& a_vB)
     float aDotB = a_vA.dot(a_vB);
     if (AreSimilar(aDotB, 0.f))
         return 0.f;
-    return sqrtf(1.f - (aDotB * aDotB)) / aDotB;
+    return sqrtf(1.f - (aDotB * aDotB)) / fabsf(aDotB);
 }
 
 float BRDF_D(const Vector3f & a_vM, const Vector3f& a_vNormal, float a_fAlpha)
@@ -76,12 +76,13 @@ float BRDF_G1(const Vector3f & a_vV, const Vector3f & a_vM, const Vector3f& a_vN
         return 1.f;
 
     float vDotN = a_vV.dot(a_vNormal);
+    float vDotM = a_vV.dot(a_vM);
     if (AreSimilar(vDotN, 0.f))
         return 0.f;
     if (vDotN > 1.f)
         return 1.f;
     float a = sqrtf(a_fAlpha / 2.f + 1.f) / tanTheta;
-    float x = BRDF_XPlus(a_vV.dot(a_vM) / vDotN);
+    float x = BRDF_XPlus(vDotM / vDotN);
 
     return x * BRDF_G1_A(a);
 }

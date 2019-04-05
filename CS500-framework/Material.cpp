@@ -75,19 +75,20 @@ void Material::Initialize()
 
 Color Material::Attenuation(float a_fT, const Vector3f& a_vOmegaO, const Vector3f & a_vNormal)
 {
-    float omegaODotN = a_vOmegaO.dot(a_vNormal);
-    if (omegaODotN < 0.f)
+    float KtSum = Kt[0] + Kt[1] + Kt[2];
+    if (KtSum < 3.f)
     {
-        float r = pow(MATH_E, a_fT * log(Kt[0]));
-        float g = pow(MATH_E, a_fT * log(Kt[1]));
-        float b = pow(MATH_E, a_fT * log(Kt[2]));
+        float omegaODotN = a_vOmegaO.dot(a_vNormal);
+        if (omegaODotN < 0.f)
+        {
+            float r = pow(MATH_E, a_fT * log(Kt[0]));
+            float g = pow(MATH_E, a_fT * log(Kt[1]));
+            float b = pow(MATH_E, a_fT * log(Kt[2]));
 
-        return Color(r, g, b);
+            return Color(r, g, b);
+        }
     }
-    else
-    {
-        return Color(1, 1, 1);
-    }
+    return Color(1, 1, 1);
 }
 
 Color Material::Diffuse()
@@ -148,7 +149,6 @@ Color Material::Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNorm
         float DTerm = BRDF_D(m, a_vNormal, alpha);
         float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
         Color FColor = BRDF_F(a_vOmegaI, m, Ks);
-
         Color FTerm = Color(1.f - FColor[0], 1.f - FColor[1], 1.f - FColor[2]);
 
         float denom = fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
@@ -255,21 +255,6 @@ Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNo
     Color Ed = Diffuse();
     Color Er = Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
     Color Et = Transmission(a_vOmegaO, a_vNormal, a_vOmegaI, a_fT);
-
-    //if (IsColorNAN(Ed))
-    //    std::cout << "Diffuse is NAN" << std::endl;
-    //if (IsColorINF(Er))
-    //    std::cout << "Reflection is INF" << std::endl;
-    //if (IsColorNAN(Et))
-    //    std::cout << "Transmission is NAN" << std::endl;
-
-    //if (!AreSimilar(Et[0], 0.f) && !AreSimilar(Et[1], 0.f) && !AreSimilar(Et[2], 0.f))
-    //    std::cout << "Transmission " << std::endl;
-
-    //if (Et[0] < 0.f && Et[1] < 0.f && Et[2] < 0.f)
-    //    std::cout << "Et negative: " << Et << std::endl;
-    //else
-    //    std::cout << "Et: " << Et << std::endl;
 
     return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er +Et);
 }
