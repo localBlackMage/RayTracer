@@ -317,3 +317,12 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
     }
     return omegaI;
 }
+
+ImageBasedLight::ImageBasedLight(const std::string & _imageFileName)
+{
+}
+
+Color ImageBasedLight::Radiance()
+{
+    return Color();
+}

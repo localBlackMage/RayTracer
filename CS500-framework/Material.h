@@ -41,6 +41,7 @@ public:
     bool m_bIsLight;
 
     virtual bool isLight() { return false; }
+    virtual bool isSkyBox() { return false; }
 
     Material() : 
         Kd(Color(1.0, 0.5, 0.0)), 
@@ -84,9 +85,20 @@ public:
 
     Light(const Color e) : Material() { m_bIsLight = true; Kd = e; }
     virtual bool isLight() { return true; }
+    virtual bool isSkyBox() { return false; }
     //virtual void apply(const unsigned int program);
 
     Color Radiance() const { return Kd; }
+};
+
+class ImageBasedLight : public Material
+{
+public:
+    ImageBasedLight(const std::string& _imageFileName);
+    virtual bool isLight() { return true; }
+    virtual bool isSkyBox() { return true; }
+
+    Color Radiance();
 };
 
 #endif //MATERIAL_H
