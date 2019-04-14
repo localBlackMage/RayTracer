@@ -133,7 +133,7 @@ int main(int argc, char** argv)
         scene->TraceImage(image, i);
 
         //if (i % 10 == 0 && i != 0)
-        if (i == 1 || i == 8 || i == 64 || i == 512)
+        if (i == 1 || i == 8 || i == 64 || i == 512 || i % 4096 == 0)
         {
             // Write the image
             fprintf(stderr, "Writing image...\n");
