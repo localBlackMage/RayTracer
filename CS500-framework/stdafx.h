@@ -15,11 +15,16 @@
 // A good quality *thread-safe* Mersenne Twister random number generator.
 #include <random>
 
+#include <clocale>
+#include <locale>
+#include <codecvt>
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <limits>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <math.h>
@@ -38,8 +43,14 @@ using namespace gl;
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-
-
+// DirectX
+#include <dxgi.h>
+#include <d3d11.h>
+#include <d3dcommon.h>
+#include <d3dcompiler.h>
+#include <MathLib/DirectXMath.h>
+#include <MathLib/DirectXPackedVector.h>
+#include <DirectXTex/DirectXTex.h>
 
 
 
@@ -66,6 +77,7 @@ using namespace gl;
 #include "Cube.h"
 #include "Cylinder.h"
 #include "Triangle.h"
+#include "Plane.h"
 
 #include "Minimizer.h"
 #include "ShapeList.h"

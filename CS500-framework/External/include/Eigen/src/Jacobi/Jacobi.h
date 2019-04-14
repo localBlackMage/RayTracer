@@ -19,7 +19,7 @@ namespace Eigen {
   * \brief Rotation given by a cosine-sine pair.
   *
   * This class represents a Jacobi or Givens rotation.
-  * This is a 2D rotation in the plane \c J of angle \f$ \theta \f$ defined by
+  * This is a 2D rotation in the plane \c J of m_fAngle \f$ \theta \f$ defined by
   * its cosine \c c and sine \c s as follow:
   * \f$ J = \left ( \begin{array}{cc} c & \overline s \\ -s  & \overline c \end{array} \right ) \f$
   *

@@ -56,6 +56,9 @@
     <ClCompile Include="Minimizer.cpp">
       <Filter>RayTracing</Filter>
     </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="realtime.h" />
@@ -111,6 +114,9 @@
     <ClInclude Include="RTStopWatch.h" />
     <ClInclude Include="Minimizer.h">
       <Filter>RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -76,7 +76,7 @@
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>assimp.lib;External\include\freeglut\freeglut.lib;External\include\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;External\include\freeglut\freeglut.lib;External\include\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;Dbghelp.lib;DXGI.lib;D3D11.lib;DirectXTK.lib;DirectXTex.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -106,7 +106,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>assimp.lib;External\include\freeglut\freeglut.lib;External\include\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;External\include\freeglut\freeglut.lib;External\include\glbinding.lib;gdi32.lib;winmm.lib;user32.lib;glu32.lib;opengl32.lib;Dbghelp.lib;DXGI.lib;D3D11.lib;DirectXTK.lib;DirectXTex.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -137,6 +137,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="Minimizer.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="raytrace.cpp" />
     <ClCompile Include="RayTracer.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Minimizer.h" />
     <ClInclude Include="NiceTypes.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="realtime.h" />

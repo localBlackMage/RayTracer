@@ -22,7 +22,7 @@ public:
     ~RayTracer();
 
     void SetScreenDimensions(uint32 a_uWidth, uint32 a_uHeight);
-    void SetCamera(const Vector3f& a_vEye, const Quaternionf& a_qOrientation, float a_fRY);
+    void SetCamera(const Vector3f& a_vEye, const Quaternionf& a_qOrientation, float a_fRY, float a_fDistToFocusPlane, float a_fSizeOfConfusionCircle);
     void SetAmbient() {};
     void AddSphere(const Vector3f& center, float r, Material* mat);
     void AddBox(const Vector3f& base, const Vector3f& diag, Material* mat);

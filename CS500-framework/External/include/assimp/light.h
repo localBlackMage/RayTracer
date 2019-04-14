@@ -73,7 +73,7 @@ enum aiLightSourceType
     aiLightSource_POINT         = 0x2,
 
     //! A spot light source emits light in a specific
-    //! angle. It has a position and a direction it is pointing to.
+    //! m_fAngle. It has a position and a direction it is pointing to.
     //! A good example for a spot light is a light spot in
     //! sport arenas.
     aiLightSource_SPOT          = 0x3,
@@ -212,20 +212,20 @@ struct aiLight
      */
     C_STRUCT aiColor3D mColorAmbient;
 
-    /** Inner angle of a spot light's light cone.
+    /** Inner m_fAngle of a spot light's light cone.
      *
      *  The spot light has maximum influence on objects inside this
-     *  angle. The angle is given in radians. It is 2PI for point
+     *  m_fAngle. The m_fAngle is given in radians. It is 2PI for point
      *  lights and undefined for directional lights.
      */
     float mAngleInnerCone;
 
-    /** Outer angle of a spot light's light cone.
+    /** Outer m_fAngle of a spot light's light cone.
      *
-     *  The spot light does not affect objects outside this angle.
-     *  The angle is given in radians. It is 2PI for point lights and
-     *  undefined for directional lights. The outer angle must be
-     *  greater than or equal to the inner angle.
+     *  The spot light does not affect objects outside this m_fAngle.
+     *  The m_fAngle is given in radians. It is 2PI for point lights and
+     *  undefined for directional lights. The outer m_fAngle must be
+     *  greater than or equal to the inner m_fAngle.
      *  It is assumed that the application uses a smooth
      *  interpolation between the inner and the outer cone of the
      *  spot light.

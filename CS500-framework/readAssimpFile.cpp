@@ -71,8 +71,8 @@ void recurseModelNodes(Scene* scene,
         //     scene->setAlpha(s);
         
         Material *material = new Material(*scene->currentMat);
-        if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &texPath))
-            material->setTexture(texPath.C_Str());
+        //if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &texPath))
+        //    material->LoadTexture(texPath.C_Str());
 
         // Arrays to hold all vertex and triangle data.
         MeshData* meshdata = new MeshData;

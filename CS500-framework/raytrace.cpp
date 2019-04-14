@@ -36,18 +36,35 @@ Quaternionf Orientation(int i,
     Quaternionf q(1,0,0,0); // Unit quaternion
     while (i < int(strings.size())) {
         std::string c = strings[i++];
-        if (c == "x")  
-            q *= angleAxis(f[i++]*Radians, Vector3f::UnitX());
-        else if (c == "y")  
-            q *= angleAxis(f[i++]*Radians, Vector3f::UnitY());
-        else if (c == "z")  
-            q *= angleAxis(f[i++]*Radians, Vector3f::UnitZ());
-        else if (c == "q")  {
+        if (c == "o")
+        {
+            q *= angleAxis(f[i++] * Radians, Vector3f::UnitX());
+            q *= angleAxis(f[i++] * Radians, Vector3f::UnitY());
+            q *= angleAxis(f[i++] * Radians, Vector3f::UnitZ());
+        }
+        else if (c == "x")
+        {
+            q *= angleAxis(f[i++] * Radians, Vector3f::UnitX());
+        }
+        else if (c == "y")
+        {
+            q *= angleAxis(f[i++] * Radians, Vector3f::UnitY());
+        }
+        else if (c == "z")
+        {
+            q *= angleAxis(f[i++] * Radians, Vector3f::UnitZ());
+        }
+        else if (c == "q")  
+        {
             q *= Quaternionf(f[i+0], f[i+1], f[i+2], f[i+3]);
-            i+=4; }
-        else if (c == "a")  {
+            i+=4; 
+        }
+        else if (c == "a")  
+        {
             q *= angleAxis(f[i+0]*Radians, Vector3f(f[i+1], f[i+2], f[i+3]).normalized());
-            i+=4; } }
+            i+=4; 
+        } 
+    }
     return q;
 }
 
@@ -69,7 +86,7 @@ void Scene::Command(const std::vector<std::string>& strings,
         // syntax: camera x y z   ry   <orientation spec>
         // Eye position (x,y,z),  view orientation (qw qx qy qz),  frustum height ratio ry
         //realtime->setCamera(Vector3f(f[1],f[2],f[3]), Orientation(5,strings,f), f[4]);
-        m_pRayTracer->SetCamera(Vector3f(f[1], f[2], f[3]), Orientation(5, strings, f), f[4]);
+        m_pRayTracer->SetCamera(Vector3f(f[1], f[2], f[3]), Orientation(7, strings, f), f[4], f[5], f[6]);
     }
 
     else if (c == "ambient") {
@@ -102,7 +119,7 @@ void Scene::Command(const std::vector<std::string>& strings,
         // syntax: light  r g b   
         // The rgb is the emission of the light
         // Creates a Material instance to be picked up by successive shapes
-        currentMat = new ImageBasedLight(f[1]);
+        currentMat = new ImageBasedLight(strings[1]);
     }
    
     else if (c == "sphere") {
@@ -147,7 +164,7 @@ void Scene::TraceImage(Color* image, const uint32 pass)
 {
     fprintf(stderr, "Pass Number: %d\n", pass);
     //fprintf(stderr, "\nNumObjects %d\n", m_pRayTracer->NumShapes());
-//#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
+#pragma omp parallel for schedule(dynamic, 1) // Magic: Multi-thread y loop
     for (int y = 0; y < height; y++) {
         //fprintf(stderr, "Rendering %4d\r", y);
         for (int x = 0; x < width; x++) {

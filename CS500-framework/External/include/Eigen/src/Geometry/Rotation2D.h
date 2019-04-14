@@ -21,7 +21,7 @@ namespace Eigen {
   * \tparam _Scalar the scalar type, i.e., the type of the coefficients
   *
   * This class is equivalent to a single scalar representing a counter clock wise rotation
-  * as a single angle in radian. It provides some additional features such as the automatic
+  * as a single m_fAngle in radian. It provides some additional features such as the automatic
   * conversion from/to a 2x2 rotation matrix. Moreover this class aims to provide a similar
   * interface to Quaternion in order to facilitate the writing of generic algorithms
   * dealing with rotations.
@@ -58,7 +58,7 @@ protected:
 
 public:
 
-  /** Construct a 2D counter clock wise rotation from the angle \a a in radian. */
+  /** Construct a 2D counter clock wise rotation from the m_fAngle \a a in radian. */
   EIGEN_DEVICE_FUNC explicit inline Rotation2D(const Scalar& a) : m_angle(a) {}
   
   /** Default constructor wihtout initialization. The represented rotation is undefined. */
@@ -74,19 +74,19 @@ public:
     fromRotationMatrix(m.derived());
   }
 
-  /** \returns the rotation angle */
-  EIGEN_DEVICE_FUNC inline Scalar angle() const { return m_angle; }
+  /** \returns the rotation m_fAngle */
+  EIGEN_DEVICE_FUNC inline Scalar m_fAngle() const { return m_angle; }
 
-  /** \returns a read-write reference to the rotation angle */
-  EIGEN_DEVICE_FUNC inline Scalar& angle() { return m_angle; }
+  /** \returns a read-write reference to the rotation m_fAngle */
+  EIGEN_DEVICE_FUNC inline Scalar& m_fAngle() { return m_angle; }
   
-  /** \returns the rotation angle in [0,2pi] */
+  /** \returns the rotation m_fAngle in [0,2pi] */
   EIGEN_DEVICE_FUNC inline Scalar smallestPositiveAngle() const {
     Scalar tmp = numext::fmod(m_angle,Scalar(2*EIGEN_PI));
     return tmp<Scalar(0) ? tmp + Scalar(2*EIGEN_PI) : tmp;
   }
   
-  /** \returns the rotation angle in [-pi,pi] */
+  /** \returns the rotation m_fAngle in [-pi,pi] */
   EIGEN_DEVICE_FUNC inline Scalar smallestAngle() const {
     Scalar tmp = numext::fmod(m_angle,Scalar(2*EIGEN_PI));
     if(tmp>Scalar(EIGEN_PI))       tmp -= Scalar(2*EIGEN_PI);
@@ -114,7 +114,7 @@ public:
   EIGEN_DEVICE_FUNC Matrix2 toRotationMatrix() const;
 
   /** Set \c *this from a 2x2 rotation matrix \a mat.
-    * In other words, this function extract the rotation angle from the rotation matrix.
+    * In other words, this function extract the rotation m_fAngle from the rotation matrix.
     *
     * This method is an alias for fromRotationMatrix()
     *
@@ -146,7 +146,7 @@ public:
   template<typename OtherScalarType>
   EIGEN_DEVICE_FUNC inline explicit Rotation2D(const Rotation2D<OtherScalarType>& other)
   {
-    m_angle = Scalar(other.angle());
+    m_angle = Scalar(other.m_fAngle());
   }
 
   EIGEN_DEVICE_FUNC static inline Rotation2D Identity() { return Rotation2D(0); }
@@ -168,7 +168,7 @@ typedef Rotation2D<float> Rotation2Df;
 typedef Rotation2D<double> Rotation2Dd;
 
 /** Set \c *this from a 2x2 rotation matrix \a mat.
-  * In other words, this function extract the rotation angle
+  * In other words, this function extract the rotation m_fAngle
   * from the rotation matrix.
   */
 template<typename Scalar>

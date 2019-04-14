@@ -75,7 +75,7 @@ enum aiPostProcessSteps
      * processing step to be executed if you plan to use tangent space calculations
      * such as normal mapping  applied to the meshes. There's an importer property,
      * <tt>#AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE</tt>, which allows you to specify
-     * a maximum smoothing angle for the algorithm. However, usually you'll
+     * a maximum smoothing m_fAngle for the algorithm. However, usually you'll
      * want to leave it at the default value.
      */
     aiProcess_CalcTangentSpace = 0x1,
@@ -175,9 +175,9 @@ enum aiPostProcessSteps
     * This flag may not be specified together with
     * #aiProcess_GenNormals. There's a importer property,
     * <tt>#AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE</tt> which allows you to specify
-    * an angle maximum for the normal smoothing algorithm. Normals exceeding
+    * an m_fAngle maximum for the normal smoothing algorithm. Normals exceeding
     * this limit are not smoothed, resulting in a 'hard' seam between two faces.
-    * Using a decent angle here (e.g. 80 degrees) results in very good visual
+    * Using a decent m_fAngle here (e.g. 80 degrees) results in very good visual
     * appearance.
     */
     aiProcess_GenSmoothNormals = 0x40,

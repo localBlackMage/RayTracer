@@ -70,8 +70,8 @@ public:
     /** Construct from euler angles */
     aiQuaterniont( TReal rotx, TReal roty, TReal rotz);
 
-    /** Construct from an axis-angle pair */
-    aiQuaterniont( aiVector3t<TReal> axis, TReal angle);
+    /** Construct from an axis-m_fAngle pair */
+    aiQuaterniont( aiVector3t<TReal> axis, TReal m_fAngle);
 
     /** Construct from a normalized quaternion stored in a vec3 */
     explicit aiQuaterniont( aiVector3t<TReal> normalized);

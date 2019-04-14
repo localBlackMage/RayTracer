@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
-Quaternionf angleAxis(const float& angle, const Vector3f& axis)
-{ return Quaternionf(AngleAxisf(angle, axis)); }
+Quaternionf angleAxis(const float& m_fAngle, const Vector3f& axis)
+{ return Quaternionf(AngleAxisf(m_fAngle, axis)); }
 
 Matrix4f toMat4(const Quaternionf& q)
 { return Transform<float,3,Affine>(q).matrix(); }
 
-Matrix4f rotate(const float& angle, const Vector3f& axis)
+Matrix4f rotate(const float& m_fAngle, const Vector3f& axis)
 {  return Transform<float,3,Affine>(
-                         Quaternionf(AngleAxisf(angle, axis))).matrix(); }
+                         Quaternionf(AngleAxisf(m_fAngle, axis))).matrix(); }
         
 Matrix4f scale(const Vector3f& v)
 {  return Transform<float,3,Affine>(

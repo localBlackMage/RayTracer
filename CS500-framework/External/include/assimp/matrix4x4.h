@@ -167,7 +167,7 @@ public:
 	 * Thx to good FAQ at http://www.gamedev.ru/code/articles/faq_matrix_quat
      *  @param [out] pScaling - Receives the output scaling for the x,y,z axes.
      *  @param [out] pRotationAxis - Receives the output rotation axis.
-	 *  @param [out] pRotationAngle - Receives the output rotation angle for @ref pRotationAxis.
+	 *  @param [out] pRotationAngle - Receives the output rotation m_fAngle for @ref pRotationAxis.
      *  @param [out] pPosition - Receives the output position for the x,y,z axes.
      */
     void Decompose(aiVector3t<TReal>& pScaling, aiVector3t<TReal>& pRotationAxis, TReal& pRotationAngle, aiVector3t<TReal>& pPosition) const;
@@ -185,9 +185,9 @@ public:
 
     // -------------------------------------------------------------------
     /** @brief Creates a trafo matrix from a set of euler angles
-     *  @param x Rotation angle for the x-axis, in radians
-     *  @param y Rotation angle for the y-axis, in radians
-     *  @param z Rotation angle for the z-axis, in radians
+     *  @param x Rotation m_fAngle for the x-axis, in radians
+     *  @param y Rotation m_fAngle for the y-axis, in radians
+     *  @param z Rotation m_fAngle for the z-axis, in radians
      */
     aiMatrix4x4t& FromEulerAnglesXYZ(TReal x, TReal y, TReal z);
     aiMatrix4x4t& FromEulerAnglesXYZ(const aiVector3t<TReal>& blubb);
@@ -195,7 +195,7 @@ public:
 public:
     // -------------------------------------------------------------------
     /** @brief Returns a rotation matrix for a rotation around the x axis
-     *  @param a Rotation angle, in radians
+     *  @param a Rotation m_fAngle, in radians
      *  @param out Receives the output matrix
      *  @return Reference to the output matrix
      */
@@ -203,7 +203,7 @@ public:
 
     // -------------------------------------------------------------------
     /** @brief Returns a rotation matrix for a rotation around the y axis
-     *  @param a Rotation angle, in radians
+     *  @param a Rotation m_fAngle, in radians
      *  @param out Receives the output matrix
      *  @return Reference to the output matrix
      */
@@ -211,7 +211,7 @@ public:
 
     // -------------------------------------------------------------------
     /** @brief Returns a rotation matrix for a rotation around the z axis
-     *  @param a Rotation angle, in radians
+     *  @param a Rotation m_fAngle, in radians
      *  @param out Receives the output matrix
      *  @return Reference to the output matrix
      */
@@ -219,7 +219,7 @@ public:
 
     // -------------------------------------------------------------------
     /** Returns a rotation matrix for a rotation around an arbitrary axis.
-     *  @param a Rotation angle, in radians
+     *  @param a Rotation m_fAngle, in radians
      *  @param axis Rotation axis, should be a normalized vector.
      *  @param out Receives the output matrix
      *  @return Reference to the output matrix

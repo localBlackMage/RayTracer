@@ -6,6 +6,26 @@
 #include "Material.h"
 #endif //STB_IMAGE_IMPLEMENTATION
 
+Color operator*(const Color& lhs, const Pixel& rhs)
+{
+    return Color(rhs.r * lhs[0], rhs.g * lhs[1], rhs.b * lhs[2]);
+}
+
+Color operator*(const Pixel& lhs, const Color& rhs)
+{
+    return rhs * lhs;
+}
+
+Color operator*(const Pixel& lhs, const float& rhs)
+{
+    return Color(lhs.r * rhs, lhs.g * rhs, lhs.b * rhs);
+}
+
+Color operator*(const float& lhs, const Pixel& rhs)
+{
+    return rhs * lhs;
+}
+
 eDirection IORDirection(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal)
 {
     float omegaOdotN = a_vOmegaO.dot(a_vNormal);
@@ -208,15 +228,6 @@ float Material::PDFTransmission(const Vector3f & a_vOmegaO, const Vector3f & a_v
         float denominator = (etaO * a_vOmegaI.dot(m) + etaI * a_vOmegaO.dot(m));
         denominator *= denominator;
         newPT = BRDF_D(m, a_vNormal, alpha) * fabsf(a_vNormal.dot(m)) * (numerator / denominator);
-
-        //if (isnan(newPT))
-        //{
-        //    std::cout << "newPT is nan :: numerator : " << numerator << " :: denominator :: " << denominator << std::endl;
-        //    std::cout << "EtaO : " << etaO << " :: EtaI : " << etaI << std::endl;
-        //    std::cout << "M: " << m << std::endl;
-        //    std::cout << "a_vOmegaI: " << a_vOmegaI << std::endl;
-        //    std::cout << "a_vOmegaO: " << a_vOmegaO << std::endl;
-        //}
     }
 
     if (isnan(newPT))
@@ -227,27 +238,6 @@ float Material::PDFTransmission(const Vector3f & a_vOmegaO, const Vector3f & a_v
     {
         return newPT;
     }
-}
-
-void Material::setTexture(const std::string path)
-{
-    //int width, height, n;
-    //stbi_set_flip_vertically_on_load(true);
-    //unsigned char* image = stbi_load(path.c_str(), &width, &height, &n, 0);
-
-    //// Realtime code below:  This sends the texture in *image to the graphics card.
-    //// The raytracer will not use this code (nor any features of OpenGL nor the graphics card).
-    //glGenTextures(1, &texid);
-    //glBindTexture(GL_TEXTURE_2D, texid);
-    //glTexImage2D(GL_TEXTURE_2D, 0, n, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 100);
-    //glGenerateMipmap(GL_TEXTURE_2D);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (int)GL_LINEAR);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (int)GL_LINEAR_MIPMAP_LINEAR);
-    //glBindTexture(GL_TEXTURE_2D, 0);
-
-    //stbi_image_free(image);
 }
 
 Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT)
@@ -320,9 +310,168 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
 
 ImageBasedLight::ImageBasedLight(const std::string & _imageFileName)
 {
+    LoadTexture(_imageFileName);
+    m_Image.Preprocess();
+    m_Image.m_fAngle = 0.f;
 }
 
-Color ImageBasedLight::Radiance()
+inline std::wstring s2ws(const char* a_pszStr)
 {
-    return Color();
+    using convert_typeX = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_typeX, wchar_t> converterX;
+    return converterX.from_bytes(a_pszStr);
 }
+
+void ImageBasedLight::LoadTexture(const std::string& _imageFileName)
+{    
+    DirectX::ScratchImage scratchImage;
+    DirectX::TexMetadata meta;
+    HRESULT hResult = DirectX::LoadFromHDRFile(s2ws(_imageFileName.c_str()).c_str(), &meta, scratchImage);
+
+    if (FAILED(hResult))
+    {
+        std::cout << "Failed to load " << _imageFileName << std::endl;
+    }
+
+    byte* pixels = scratchImage.GetPixels();
+    size_t numBytes = scratchImage.GetPixelsSize();
+
+    m_Image.m_NumChannels = 3;
+
+    if (meta.format == DXGI_FORMAT_R32G32B32A32_FLOAT)
+    {
+        float x = 0, y = 0;
+        for (size_t offset = 0; offset < numBytes; offset += 16)
+        {
+            Pixel currentPixel;
+            byte* curPixelChannel = pixels + offset;
+            memcpy(&currentPixel.r, &pixels[offset], 12);
+            m_Image.m_Data.push_back(currentPixel);
+        }
+
+        m_Image.m_Data.shrink_to_fit();
+        m_Image.m_Height = meta.height;
+        m_Image.m_Width = meta.width;
+    }
+    else
+    {
+        std::cout << "Unaccounted for format: " << meta.format << std::endl;
+    }
+}
+
+float Luminence(const Pixel& a_Pixel)
+{
+    return 0.2126f * a_Pixel.r + 0.7152f * a_Pixel.g + 0.0722f * a_Pixel.b;
+}
+
+void HDRImage::Preprocess()
+{
+    m_pBuffer = new float[m_Width * (m_Height + 1)];
+    m_pUDist = &m_pBuffer[m_Width * m_Height];
+    float* pSinTheta = new float[m_Height];
+
+    float angleFrac = PI / float(m_Height);
+    float theta = angleFrac * 0.5f;
+
+    for (uint32 i = 0; i < m_Height; i++, theta += angleFrac)
+    {
+        pSinTheta[i] = sinf(theta);
+    }
+
+    for (uint32 i = 0, m = 0; i < m_Width; i++, m += m_Height)
+    {
+        float * pVDist = &m_pBuffer[m];
+        pVDist[0] = Luminence(m_Data[i]);
+        pVDist[0] *= pSinTheta[0];
+
+        for (uint32 j = 1, k = m_Width + i; j < m_Height; j++, k += m_Width)
+        {
+            float lum = Luminence(m_Data[k]);
+            pVDist[j] = pVDist[j - 1] + lum * pSinTheta[j];
+        }
+
+        if (i == 0)
+        {
+            m_pUDist[i] = pVDist[m_Height - 1];
+        }
+        else
+        {
+            m_pUDist[i] = m_pUDist[i - 1] + pVDist[m_Height - 1];
+        }
+    }
+
+}
+
+Color ImageBasedLight::Radiance(const Intersection & a_Intersection)
+{
+    Vector3f P = a_Intersection.m_vPoint;
+    P.normalize();
+    double u = (/*m_Image.m_fAngle - */atan2(P[1], P[0])) / PI_2;
+    u = u - floor(u);         // Wrap to be within 0...1
+    double v = acos(P[2]) / PI;
+    int i0 = floor(u*m_Image.m_Width);
+    int j0 = floor(v*m_Image.m_Height);
+    double uw[2], vw[2];
+    uw[1] = u * m_Image.m_Width - i0;  uw[0] = 1.0 - uw[1];
+    vw[1] = v * m_Image.m_Height - j0;  vw[0] = 1.0 - vw[1];
+    Color r(0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            int k = (((j0 + j) % m_Image.m_Height) * m_Image.m_Width + ((i0 + i) % m_Image.m_Width));
+            r += uw[i] * vw[j] * m_Image.m_Data[k];
+        }
+    }
+
+    return r;
+}
+
+void ImageBasedLight::SampleAsLight(Intersection & a_Intersection)
+{
+    float u = MersenneRandFloat();
+    float v = MersenneRandFloat();
+
+    float maxUVal = m_Image.m_pUDist[m_Image.m_Width - 1];
+    float* pUPos = std::lower_bound(m_Image.m_pUDist, m_Image.m_pUDist + m_Image.m_Width, u * maxUVal);
+
+    int iu = pUPos - m_Image.m_pUDist;
+    float* pVDist = &m_Image.m_pBuffer[m_Image.m_Height * iu];
+    float* pVPos = std::lower_bound(pVDist, pVDist + m_Image.m_Height, v * pVDist[m_Image.m_Height - 1]);
+
+    int iv = pVPos - pVDist;
+
+    float phi = /*m_Image.m_fAngle - */PI_2 * (iu / float(m_Image.m_Width));
+    float theta = PI * (iv / float(m_Image.m_Height));
+    
+    a_Intersection.m_vNormal = Vector3f(sinf(theta) * cosf(phi),
+                                        sinf(theta) * sinf(phi),
+                                        cosf(theta)).normalized();
+}
+
+float ImageBasedLight::PDFAsLight(const Intersection & a_Intersection)
+{
+    Vector3f P = a_Intersection.m_vPoint;
+    P.normalize();
+    double fu = (/*m_Image.m_fAngle - */atan2(P[1], P[0])) / PI_2;
+    fu = fu - floor(fu);         // Wrap to be within 0...1
+    int u = floor(double(m_Image.m_Width) * fu);
+    int v = floor(float(m_Image.m_Height) * acosf(P[2]) / PI);
+    float angleFrac = PI / float(m_Image.m_Height);
+    float* pVDist = &m_Image.m_pBuffer[m_Image.m_Height*u];
+    float pdfU = (u == 0) ? (m_Image.m_pUDist[0]) : (m_Image.m_pUDist[u] - m_Image.m_pUDist[u - 1]);
+    pdfU /= m_Image.m_pUDist[m_Image.m_Width - 1];
+    pdfU *= m_Image.m_Width / PI_2;
+    float pdfV = (v == 0) ? (pVDist[0]) : (pVDist[v] - pVDist[v - 1]);
+    pdfV /= pVDist[m_Image.m_Height - 1];
+    pdfV *= m_Image.m_Height / PI;
+    float theta = angleFrac * 0.5 + angleFrac * v;
+    float pdf = pdfU * pdfV*sinf(theta) / (4.f*PI*m_fRadius*m_fRadius);
+
+    //printf("(%f %f %f) %d %d %g\n", P[0], P[1], P[2], u, v, pdf);
+
+    return pdf;
+}
+
+

@@ -189,7 +189,7 @@ pmax(const Packet& a,
 template<typename Packet> EIGEN_DEVICE_FUNC inline Packet
 pabs(const Packet& a) { using std::abs; return abs(a); }
 
-/** \internal \returns the phase angle of \a a */
+/** \internal \returns the phase m_fAngle of \a a */
 template<typename Packet> EIGEN_DEVICE_FUNC inline Packet
 parg(const Packet& a) { using numext::arg; return arg(a); }
 

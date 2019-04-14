@@ -16,7 +16,7 @@ namespace Eigen {
   *
   * \class AngleAxis
   *
-  * \brief Represents a 3D rotation as a rotation angle around an arbitrary 3D axis
+  * \brief Represents a 3D rotation as a rotation m_fAngle around an arbitrary 3D axis
   *
   * \param _Scalar the scalar type, i.e., the type of the coefficients.
   *
@@ -70,27 +70,27 @@ public:
 
   /** Default constructor without initialization. */
   EIGEN_DEVICE_FUNC AngleAxis() {}
-  /** Constructs and initialize the angle-axis rotation from an \a angle in radian
+  /** Constructs and initialize the m_fAngle-axis rotation from an \a m_fAngle in radian
     * and an \a axis which \b must \b be \b normalized.
     *
-    * \warning If the \a axis vector is not normalized, then the angle-axis object
+    * \warning If the \a axis vector is not normalized, then the m_fAngle-axis object
     *          represents an invalid rotation. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC 
-  inline AngleAxis(const Scalar& angle, const MatrixBase<Derived>& axis) : m_axis(axis), m_angle(angle) {}
-  /** Constructs and initialize the angle-axis rotation from a quaternion \a q.
+  inline AngleAxis(const Scalar& m_fAngle, const MatrixBase<Derived>& axis) : m_axis(axis), m_angle(m_fAngle) {}
+  /** Constructs and initialize the m_fAngle-axis rotation from a quaternion \a q.
     * This function implicitly normalizes the quaternion \a q.
     */
   template<typename QuatDerived> 
   EIGEN_DEVICE_FUNC inline explicit AngleAxis(const QuaternionBase<QuatDerived>& q) { *this = q; }
-  /** Constructs and initialize the angle-axis rotation from a 3x3 rotation matrix. */
+  /** Constructs and initialize the m_fAngle-axis rotation from a 3x3 rotation matrix. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline explicit AngleAxis(const MatrixBase<Derived>& m) { *this = m; }
 
-  /** \returns the value of the rotation angle in radian */
-  EIGEN_DEVICE_FUNC Scalar angle() const { return m_angle; }
-  /** \returns a read-write reference to the stored angle in radian */
-  EIGEN_DEVICE_FUNC Scalar& angle() { return m_angle; }
+  /** \returns the value of the rotation m_fAngle in radian */
+  EIGEN_DEVICE_FUNC Scalar m_fAngle() const { return m_angle; }
+  /** \returns a read-write reference to the stored m_fAngle in radian */
+  EIGEN_DEVICE_FUNC Scalar& m_fAngle() { return m_angle; }
 
   /** \returns the rotation axis */
   EIGEN_DEVICE_FUNC const Vector3& axis() const { return m_axis; }
@@ -112,7 +112,7 @@ public:
   friend EIGEN_DEVICE_FUNC inline QuaternionType operator* (const QuaternionType& a, const AngleAxis& b)
   { return a * QuaternionType(b); }
 
-  /** \returns the inverse rotation, i.e., an angle-axis with opposite rotation angle */
+  /** \returns the inverse rotation, i.e., an m_fAngle-axis with opposite rotation m_fAngle */
   EIGEN_DEVICE_FUNC AngleAxis inverse() const
   { return AngleAxis(-m_angle, m_axis); }
 
@@ -139,7 +139,7 @@ public:
   EIGEN_DEVICE_FUNC inline explicit AngleAxis(const AngleAxis<OtherScalarType>& other)
   {
     m_axis = other.axis().template cast<Scalar>();
-    m_angle = Scalar(other.angle());
+    m_angle = Scalar(other.m_fAngle());
   }
 
   EIGEN_DEVICE_FUNC static inline const AngleAxis Identity() { return AngleAxis(Scalar(0), Vector3::UnitX()); }
@@ -153,15 +153,15 @@ public:
 };
 
 /** \ingroup Geometry_Module
-  * single precision angle-axis type */
+  * single precision m_fAngle-axis type */
 typedef AngleAxis<float> AngleAxisf;
 /** \ingroup Geometry_Module
-  * double precision angle-axis type */
+  * double precision m_fAngle-axis type */
 typedef AngleAxis<double> AngleAxisd;
 
 /** Set \c *this from a \b unit quaternion.
   *
-  * The resulting axis is normalized, and the computed angle is in the [0,pi] range.
+  * The resulting axis is normalized, and the computed m_fAngle is in the [0,pi] range.
   * 
   * This function implicitly normalizes the quaternion \a q.
   */

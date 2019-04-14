@@ -56,7 +56,14 @@ void ShapeList::SampleLight(Intersection& a_Intersection)
     pShape->GetRandomIntersectionPoint(a_Intersection);
 }
 
-float ShapeList::PDFLight(const Shape* a_pShape) const
+float ShapeList::PDFLight(const Intersection & a_Intersection) const
 {
-    return 1.f / (a_pShape->Area() * float(m_ShapeList.size()));
+    if (a_Intersection.m_pMaterial->isSkyBox())
+    {
+        return static_cast<ImageBasedLight*>(a_Intersection.m_pMaterial)->PDFAsLight(a_Intersection);
+    }
+    else
+    {
+        return 1.f / (a_Intersection.m_pShape->Area() * float(m_ShapeList.size()));
+    }
 }

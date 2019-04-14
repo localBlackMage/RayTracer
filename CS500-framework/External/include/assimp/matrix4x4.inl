@@ -450,21 +450,21 @@ inline void aiMatrix4x4t<TReal>::Decompose(aiVector3t<TReal>& pScaling, aiVector
 
 	if(std::fabs(C) > epsilon)
 	{
-		// Finding angle around oX.
+		// Finding m_fAngle around oX.
 		TReal tan_x = vCols[2].z / C;// A
 		TReal tan_y = vCols[1].z / C;// B
 
 		pRotation.x = std::atan2(tan_y, tan_x);
-		// Finding angle around oZ.
+		// Finding m_fAngle around oZ.
 		tan_x = vCols[0].x / C;// E
 		tan_y = vCols[0].y / C;// F
 		pRotation.z = std::atan2(tan_y, tan_x);
 	}
 	else
 	{// oY is fixed.
-		pRotation.x = 0;// Set angle around oX to 0. => A == 1, B == 0, C == 0, D == 1.
+		pRotation.x = 0;// Set m_fAngle around oX to 0. => A == 1, B == 0, C == 0, D == 1.
 
-		// And finding angle around oZ.
+		// And finding m_fAngle around oZ.
 		TReal tan_x =  vCols[1].y;// BDF+AE => E
 		TReal tan_y = -vCols[1].x;// BDE-AF => F
 

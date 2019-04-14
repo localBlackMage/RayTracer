@@ -24,7 +24,7 @@ public:
 
     bool Hit(const Ray& a_Ray, Intersection& a_Hit, float a_fTMin = MINIMUM, float a_fTMax = INF) const;
     void SampleLight(Intersection& a_Intersection);
-    float PDFLight(const Shape* a_pShape) const;
+    float PDFLight(const Intersection& a_Intersection) const;
 };
 
 #endif //SHAPE_LIST_H

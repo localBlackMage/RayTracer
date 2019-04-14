@@ -123,7 +123,7 @@ struct functor_traits<scalar_conjugate_op<Scalar> >
 };
 
 /** \internal
-  * \brief Template functor to compute the phase angle of a complex
+  * \brief Template functor to compute the phase m_fAngle of a complex
   *
   * \sa class CwiseUnaryOp, Cwise::arg
   */

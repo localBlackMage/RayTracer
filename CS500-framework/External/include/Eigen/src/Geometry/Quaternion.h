@@ -52,7 +52,7 @@ class QuaternionBase : public RotationBase<Derived, 3>
   typedef Matrix<Scalar,3,1> Vector3;
   /** the equivalent rotation matrix type */
   typedef Matrix<Scalar,3,3> Matrix3;
-  /** the equivalent angle-axis type */
+  /** the equivalent m_fAngle-axis type */
   typedef AngleAxis<Scalar> AngleAxisType;
 
 
@@ -128,7 +128,7 @@ class QuaternionBase : public RotationBase<Derived, 3>
 
     /** \returns the dot product of \c *this and \a other
     * Geometrically speaking, the dot product of two unit quaternions
-    * corresponds to the cosine of half the angle between the two rotations.
+    * corresponds to the cosine of half the m_fAngle between the two rotations.
     * \sa angularDistance()
     */
   template<class OtherDerived> EIGEN_DEVICE_FUNC inline Scalar dot(const QuaternionBase<OtherDerived>& other) const { return coeffs().dot(other.coeffs()); }
@@ -256,7 +256,7 @@ public:
   /** Copy constructor */
   template<class Derived> EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Quaternion(const QuaternionBase<Derived>& other) { this->Base::operator=(other); }
 
-  /** Constructs and initializes a quaternion from the angle-axis \a aa */
+  /** Constructs and initializes a quaternion from the m_fAngle-axis \a aa */
   EIGEN_DEVICE_FUNC explicit inline Quaternion(const AngleAxisType& aa) { *this = aa; }
 
   /** Constructs and initializes a quaternion from either:
@@ -494,14 +494,14 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& QuaternionBase<Derived>::operator
   return derived();
 }
 
-/** Set \c *this from an angle-axis \a aa and returns a reference to \c *this
+/** Set \c *this from an m_fAngle-axis \a aa and returns a reference to \c *this
   */
 template<class Derived>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& QuaternionBase<Derived>::operator=(const AngleAxisType& aa)
 {
   EIGEN_USING_STD_MATH(cos)
   EIGEN_USING_STD_MATH(sin)
-  Scalar ha = Scalar(0.5)*aa.angle(); // Scalar(0.5) to suppress precision loss warnings
+  Scalar ha = Scalar(0.5)*aa.m_fAngle(); // Scalar(0.5) to suppress precision loss warnings
   this->w() = cos(ha);
   this->vec() = sin(ha) * aa.axis();
   return derived();
@@ -694,7 +694,7 @@ QuaternionBase<Derived>::conjugate() const
                          
 }
 
-/** \returns the angle (in radian) between two rotations
+/** \returns the m_fAngle (in radian) between two rotations
   * \sa dot()
   */
 template <class Derived>
@@ -736,7 +736,7 @@ QuaternionBase<Derived>::slerp(const Scalar& t, const QuaternionBase<OtherDerive
   }
   else
   {
-    // theta is the angle between the 2 quaternions
+    // theta is the m_fAngle between the 2 quaternions
     Scalar theta = acos(absD);
     Scalar sinTheta = sin(theta);
 

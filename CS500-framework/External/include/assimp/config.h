@@ -139,10 +139,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ---------------------------------------------------------------------------
-/** @brief  Specifies the maximum angle that may be between two vertex tangents
+/** @brief  Specifies the maximum m_fAngle that may be between two vertex tangents
  *         that their tangents and bi-tangents are smoothed.
  *
- * This applies to the CalcTangentSpace-Step. The angle is specified
+ * This applies to the CalcTangentSpace-Step. The m_fAngle is specified
  * in degrees. The maximum value is 175.
  * Property type: float. Default value: 45 degrees
  */
@@ -160,11 +160,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     "PP_CT_TEXTURE_CHANNEL_INDEX"
 
 // ---------------------------------------------------------------------------
-/** @brief  Specifies the maximum angle that may be between two face normals
+/** @brief  Specifies the maximum m_fAngle that may be between two face normals
  *          at the same vertex position that their are smoothed together.
  *
- * Sometimes referred to as 'crease angle'.
- * This applies to the GenSmoothNormals-Step. The angle is specified
+ * Sometimes referred to as 'crease m_fAngle'.
+ * This applies to the GenSmoothNormals-Step. The m_fAngle is specified
  * in degrees, so 180 is PI. The default value is 175 degrees (all vertex
  * normals are smoothed). The maximum value is 175, too. Property type: float.
  * Warning: setting this option may cause a severe loss of performance. The
@@ -894,7 +894,7 @@ enum aiComponent
 #define AI_CONFIG_IMPORT_IFC_CUSTOM_TRIANGULATION "IMPORT_IFC_CUSTOM_TRIANGULATION"
 
 // ---------------------------------------------------------------------------
-/** @brief  Set the tessellation conic angle for IFC smoothing curves.
+/** @brief  Set the tessellation conic m_fAngle for IFC smoothing curves.
  *
  * This is used by the IFC importer to determine the tessellation parameter
  * for smoothing curves.

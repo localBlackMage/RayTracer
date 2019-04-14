@@ -22,6 +22,7 @@ public:
     Bbox GetBoundingBox() const { return m_BoundingBox; }
     virtual void GetRandomIntersectionPoint(Intersection& a_Intersection) const = 0;
     virtual float Area() const { return m_fArea; }
+    Material* GetMaterial() const { return m_pMaterial; }
 };
 
 Bbox bounding_box(const Shape* obj);

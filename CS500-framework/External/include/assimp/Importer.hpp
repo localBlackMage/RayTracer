@@ -410,8 +410,8 @@ public:
      * A human-readable error description can be retrieved by calling
      * GetErrorString(). The previous scene will be deleted during this call.
      * Calling this method doesn't affect the active IOSystem.
-     * @param pBuffer Pointer to the file data
-     * @param pLength Length of pBuffer, in bytes
+     * @param m_pBuffer Pointer to the file data
+     * @param pLength Length of m_pBuffer, in bytes
      * @param pFlags Optional post processing steps to be executed after
      *   a successful import. Provide a bitwise combination of the
      *   #aiPostProcessSteps flags. If you wish to inspect the imported
@@ -437,7 +437,7 @@ public:
      * the regular ReadFile() API.
      */
     const aiScene* ReadFileFromMemory(
-        const void* pBuffer,
+        const void* m_pBuffer,
         size_t pLength,
         unsigned int pFlags,
         const char* pHint = "");

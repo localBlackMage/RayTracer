@@ -65,9 +65,6 @@ public:
     Material(Material& o) { Kd = o.Kd;  Ks = o.Ks; Kt = o.Kt; alpha = o.alpha; m_IOR = o.m_IOR; texid = o.texid; eMatType = o.eMatType; m_bIsLight = o.m_bIsLight; Initialize(); }
     virtual ~Material() {};
 
-    void setTexture(const std::string path);
-    //virtual void apply(const unsigned int program);
-
     Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI, float a_fT);
 
     float PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
@@ -88,17 +85,49 @@ public:
     virtual bool isSkyBox() { return false; }
     //virtual void apply(const unsigned int program);
 
-    Color Radiance() const { return Kd; }
+    virtual Color Radiance() const { return Kd; }
+};
+
+struct Pixel
+{
+    float r, g, b;
+};
+
+Color operator*(const Color& lhs, const Pixel& rhs);
+
+Color operator*(const Pixel& lhs, const Color& rhs);
+
+Color operator*(const Pixel& lhs, const float& rhs);
+
+Color operator*(const float& lhs, const Pixel& rhs);
+
+struct HDRImage {
+    std::vector<Pixel> m_Data;
+    int m_Width, m_Height, m_NumChannels;
+    float* m_pBuffer;
+    float* m_pUDist;
+    float m_fAngle;
+
+    void Preprocess();
 };
 
 class ImageBasedLight : public Material
 {
+protected:
+    HDRImage m_Image;
+    float m_fRadius;
+
+    void LoadTexture(const std::string& _imageFileName);
 public:
     ImageBasedLight(const std::string& _imageFileName);
     virtual bool isLight() { return true; }
     virtual bool isSkyBox() { return true; }
 
-    Color Radiance();
+    void SetRadius(float a_fRadius) { m_fRadius = a_fRadius; }
+    const HDRImage& Image() { return m_Image; }
+    virtual Color Radiance(const Intersection & a_Intersection);
+    void SampleAsLight(Intersection& a_Intersection);
+    float PDFAsLight(const Intersection & a_Intersection);
 };
 
 #endif //MATERIAL_H

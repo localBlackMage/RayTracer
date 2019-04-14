@@ -24,7 +24,11 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
     Vector3f W = Vector3f(1, 1, 1); // Accumulated Weight
     if (m_pWorld->Hit(a_Ray, P))
     {
-        if (P.m_pMaterial->isLight())
+        if (P.m_pMaterial->isSkyBox())
+        {
+            return static_cast<ImageBasedLight*>(P.m_pMaterial)->Radiance(P);
+        }
+        else if (P.m_pMaterial->isLight())
         {
             return static_cast<Light*>(P.m_pMaterial)->Radiance();
         }
@@ -38,7 +42,8 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 float p;
 #pragma region Explicit light connection
                 m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
-                p = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
+                p = m_pLights->PDFLight(L) / GeometryFactor(P, L);
+
                 // Probability the explicit light could be chosen implicitly
                 float q = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
                 float wMis = (p * p) / (p * p + q * q);
@@ -52,7 +57,17 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                     I.m_pShape == L.m_pShape)
                 {
                     f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, I.m_fT);
-                    Color explicitRadiance = W * (f / p) * static_cast<Light*>(L.m_pMaterial)->Radiance() * wMis;
+                    Color LightRadiance;
+                    if (L.m_pMaterial->isSkyBox())
+                    {
+                        LightRadiance = static_cast<ImageBasedLight*>(L.m_pMaterial)->Radiance(L);
+                    }
+                    else if (L.m_pMaterial->isLight())
+                    {
+                        LightRadiance = static_cast<Light*>(L.m_pMaterial)->Radiance();
+                    }
+
+                    Color explicitRadiance = W * (f / p) * LightRadiance * wMis;
                     C += explicitRadiance;
                 }
 #pragma endregion
@@ -77,9 +92,19 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    q = m_pLights->PDFLight(L.m_pShape) / GeometryFactor(P, L);
+                    q = m_pLights->PDFLight(L) / GeometryFactor(P, L);
                     wMis = (p * p) / (p * p + q * q);
-                    Color radiance = W * static_cast<Light*>(Q.m_pMaterial)->Radiance() * wMis;
+                    Color LightRadiance;
+                    if (Q.m_pMaterial->isSkyBox())
+                    {
+                        LightRadiance = static_cast<ImageBasedLight*>(Q.m_pMaterial)->Radiance(Q);
+                    }
+                    else if (Q.m_pMaterial->isLight())
+                    {
+                        LightRadiance = static_cast<Light*>(Q.m_pMaterial)->Radiance();
+                    }
+
+                    Color radiance = W * LightRadiance * wMis;
                     C += radiance;
                     break;
                 }
@@ -115,12 +140,17 @@ void RayTracer::SetScreenDimensions(uint32 a_uWidth, uint32 a_uHeight)
     m_uScreenHeight = a_uHeight;
 }
 
-void RayTracer::SetCamera(const Vector3f & a_vEye, const Quaternionf & a_qOrientation, float a_fRY)
+void RayTracer::SetCamera(const Vector3f & a_vEye, const Quaternionf & a_qOrientation, float a_fRY, float a_fDistToFocusPlane, float a_fSizeOfConfusionCircle)
 {
     if (m_pCamera)
         delete m_pCamera;
 
-    m_pCamera = new Camera(a_vEye, a_qOrientation, float(m_uScreenWidth), float(m_uScreenHeight), a_fRY);
+    m_pCamera = new Camera(a_vEye, a_qOrientation, float(m_uScreenWidth), float(m_uScreenHeight), a_fRY, a_fDistToFocusPlane, a_fSizeOfConfusionCircle);
+
+    if (a_fDistToFocusPlane > 0.f)
+    {
+
+    }
 }
 
 void RayTracer::AddSphere(const Vector3f & center, float r, Material * mat)
@@ -178,6 +208,14 @@ Color RayTracer::GetColor(uint32 i, uint32 j)
     float x = 2.f * (float(i) + MersenneRandFloat() - halfWidth) / nx;
     float y = 2.f * (float(j) + MersenneRandFloat() - halfHeight) / ny;
 
-    Ray ray = m_pCamera->GetRay(x, y);
+    Ray ray;
+    if (m_pCamera->HasDOF())
+    {
+        ray = m_pCamera->GetBlurredRay(x, y);
+    }
+    else
+    {
+        ray = m_pCamera->GetRay(x, y);
+    }
     return PathTrace(ray, 0);
 }

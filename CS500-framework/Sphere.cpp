@@ -12,6 +12,10 @@ Sphere::Sphere(Vector3f a_vCenter, float a_fRadius, Material* a_pMaterial) :
     m_fRadius(a_fRadius)
 {
     CreateBoundingBox();
+    if (a_pMaterial->isSkyBox())
+    {
+        static_cast<ImageBasedLight*>(a_pMaterial)->SetRadius(a_fRadius);
+    }
 }
 
 Sphere::~Sphere()
@@ -52,15 +56,18 @@ bool Sphere::Hit(const Ray & a_Ray, float a_fTMin, float a_fTMax, Intersection &
 
 void Sphere::GetRandomIntersectionPoint(Intersection & a_Intersection) const
 {
-    float Xi1 = MersenneRandFloat();
-    float Xi2 = MersenneRandFloat();
-
     if (m_pMaterial->isSkyBox())
     {
-
+        ImageBasedLight * ibl = static_cast<ImageBasedLight *> (m_pMaterial);
+        ibl->SampleAsLight(a_Intersection);
+        // Skyboxes are always at the origin
+        a_Intersection.m_vPoint = a_Intersection.m_vNormal * m_fRadius;
     }
     else
     {
+        float Xi1 = MersenneRandFloat();
+        float Xi2 = MersenneRandFloat();
+
         float z = 2 * Xi1 - 1;
         float r = sqrt(1 - (z*z));
         float a = 2 * PI*Xi2;
@@ -68,7 +75,8 @@ void Sphere::GetRandomIntersectionPoint(Intersection & a_Intersection) const
         float normalMul = m_pMaterial->isSkyBox() ? -1.f : 1.f;
         a_Intersection.m_vNormal = normalMul * Vector3f(r*cos(a), r*sin(a), z).normalized();
         a_Intersection.m_vPoint = m_vCenter + (m_fRadius * a_Intersection.m_vNormal);
-        a_Intersection.m_pShape = this;
-        a_Intersection.m_pMaterial = m_pMaterial;
     }
+
+    a_Intersection.m_pShape = this;
+    a_Intersection.m_pMaterial = m_pMaterial;
 }

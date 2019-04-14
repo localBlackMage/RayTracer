@@ -137,9 +137,9 @@ struct aiCamera
     C_STRUCT aiVector3D mLookAt;
 
 
-    /** Half horizontal field of view angle, in radians.
+    /** Half horizontal field of view m_fAngle, in radians.
      *
-     *  The field of view angle is the angle between the center
+     *  The field of view m_fAngle is the m_fAngle between the center
      *  line of the screen and the left or right border.
      *  The default value is 1/4PI.
      */

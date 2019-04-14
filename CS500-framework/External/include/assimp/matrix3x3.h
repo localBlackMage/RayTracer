@@ -125,7 +125,7 @@ public:
 public:
     // -------------------------------------------------------------------
     /** @brief Returns a rotation matrix for a rotation around z
-     *  @param a Rotation angle, in radians
+     *  @param a Rotation m_fAngle, in radians
      *  @param out Receives the output matrix
      *  @return Reference to the output matrix
      */
@@ -135,7 +135,7 @@ public:
     /** @brief Returns a rotation matrix for a rotation around
      *    an arbitrary axis.
      *
-     *  @param a Rotation angle, in radians
+     *  @param a Rotation m_fAngle, in radians
      *  @param axis Axis to rotate around
      *  @param out To be filled
      */

@@ -18,9 +18,9 @@ typedef AlignedBox<float,3> Bbox;
 // Some convenience procedures: These are all provided by Eigen, but
 // require two nested constructor calls to get the final result, with
 // the intermediate being some form of a generic Transform<...> type.
-Quaternionf angleAxis(const float& angle, const Vector3f& axis);
+Quaternionf angleAxis(const float& m_fAngle, const Vector3f& axis);
 Matrix4f toMat4(const Quaternionf& q);
-Matrix4f rotate(const float& angle, const Vector3f& axis);
+Matrix4f rotate(const float& m_fAngle, const Vector3f& axis);
 Matrix4f scale(const Vector3f& v);
 Matrix4f translate(const Vector3f& v);
 

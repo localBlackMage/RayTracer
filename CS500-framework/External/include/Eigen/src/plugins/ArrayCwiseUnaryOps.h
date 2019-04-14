@@ -45,7 +45,7 @@ abs() const
   return AbsReturnType(derived());
 }
 
-/** \returns an expression of the coefficient-wise phase angle of \c *this
+/** \returns an expression of the coefficient-wise phase m_fAngle of \c *this
   *
   * Example: \include Cwise_arg.cpp
   * Output: \verbinclude Cwise_arg.out
