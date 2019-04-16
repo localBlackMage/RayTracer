@@ -169,6 +169,11 @@ void Scene::TraceImage(Color* image, const uint32 pass)
         //fprintf(stderr, "Rendering %4d\r", y);
         for (int x = 0; x < width; x++) {
             Color c = m_pRayTracer->GetColor(x, y);
+            //if (c[0] > 1.f || c[1] > 1.f || c[2] > 1.f)
+            //{
+            //    std::cout << "Final Color is too bright: " << c << std::endl;
+            //}
+
             if (IsColorNAN(c))
             {
                 std::cout << "Final Color is NAN" << std::endl;

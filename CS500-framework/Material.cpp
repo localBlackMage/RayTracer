@@ -94,7 +94,7 @@ void Material::Initialize()
     Pt = Vector3f(Kt).norm() / S;
 #else
     S = Vector3f(Kd).norm() + Vector3f(Ks).norm();
-    Pd = Vector3f(Kd).norm() / S;
+    Pd = 1.f;// Vector3f(Kd).norm() / S;
     Pr = Vector3f(Ks).norm() / S;
 #endif
 
@@ -128,19 +128,21 @@ Color Material::Scattering_Diffuse()
 
 Color Material::Scattering_Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
-    float DTerm = BRDF_D(m, a_vNormal, alpha);
-    float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
-    Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
-    float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
-    if (AreSimilar(denom, 0.f))
-    {
-        return Color(0, 0, 0);
-    }
-    else
-    {
-        return (DTerm * GTerm * FTerm) / denom;
-    }
+    //Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
+    //float DTerm = BRDF_D(m, a_vNormal, alpha);
+    //float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+    //Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
+    //float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
+    //if (AreSimilar(denom, 0.f))
+    //{
+    //    return Color(0, 0, 0);
+    //}
+    //else
+    //{
+    //    return (DTerm * GTerm * FTerm) / denom;
+    //}
+
+    return Color(0, 0, 0);
 }
 
 Color Material::Scattering_Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT)
@@ -200,14 +202,15 @@ Color Material::Scattering_Transmission(const Vector3f& a_vOmegaO, const Vector3
 Color Material::EvalScattering(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
     Color Ed = Scattering_Diffuse();
-    Color Er = Scattering_Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
+    //Color Er = Scattering_Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
 #if MATERIAL_TRANSMISSION_ENABLED
     Color Et = Scattering_Transmission(a_vOmegaO, a_vNormal, a_vOmegaI, a_fT);
     return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er + Et);
 #else
-    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed + Er);
+    return fabsf(a_vNormal.dot(a_vOmegaI)) * (Ed /*+ Er*/);
 #endif
 }
+
 
 
 float Material::PDF_Diffuse(const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
@@ -269,7 +272,7 @@ float Material::PDF_BRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, 
     float newPD = PDF_Diffuse(a_vNormal, a_vOmegaI);
 
     // Scattering_Reflection
-    float newPR = PDF_Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
+    //float newPR = PDF_Reflection(a_vOmegaO, a_vNormal, a_vOmegaI);
 
 #if MATERIAL_TRANSMISSION_ENABLED
     // Scattering_Transmission
@@ -277,7 +280,7 @@ float Material::PDF_BRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, 
 
     return Pd * newPD + Pr * newPR + Pt * newPT;
 #else
-    return Pd * newPD + Pr * newPR;
+    return Pd * newPD;// +Pr * newPR;
 #endif
 }
 
@@ -340,11 +343,11 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
         return BRDF_Transmission(a_vOmegaO, a_vNormal);
 #else
     // Diffusion
-    if (phi < Pd)
+    //if (phi < Pd)
         return BRDF_Diffuse(a_vNormal);
     // Scattering_Reflection
-    else
-        return BRDF_Reflection(a_vOmegaO, a_vNormal);
+    //else
+    //    return BRDF_Reflection(a_vOmegaO, a_vNormal);
 #endif
 }
 

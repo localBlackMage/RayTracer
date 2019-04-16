@@ -68,11 +68,11 @@ void Sphere::GetRandomIntersectionPoint(Intersection & a_Intersection) const
         float Xi1 = MersenneRandFloat();
         float Xi2 = MersenneRandFloat();
 
-        float z = 2 * Xi1 - 1;
-        float r = sqrt(1 - (z*z));
-        float a = 2 * PI*Xi2;
+        float z = 2.f * Xi1 - 1.f;
+        float r = sqrt(1.f - (z*z));
+        float a = PI_2 * Xi2;
 
-        a_Intersection.m_vNormal = Vector3f(r*cos(a), r*sin(a), z).normalized();
+        a_Intersection.m_vNormal = Vector3f(r*cosf(a), r*sinf(a), z).normalized();
         a_Intersection.m_vPoint = m_vCenter + (m_fRadius * a_Intersection.m_vNormal);
     }
 

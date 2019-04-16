@@ -45,8 +45,8 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 p = m_pLights->PDFLight(L) / GeometryFactor(P, L);
 
                 // Probability the explicit light could be chosen implicitly
-                q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
-                wMis = (p * p) / (p * p + q * q);
+                q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI);// * RUSSIAN_ROULETTE;
+                wMis = 1.f;// (p * p) / (p * p + q * q);
                 omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
                 // Cast the shadow ray
@@ -54,7 +54,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (p > 0.f && m_pWorld->Hit(explicitRay, I) && I.m_vPoint.isApprox(L.m_vPoint) && I.m_pShape == L.m_pShape)
                 {
                     f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
-                    Color LightRadiance;
+                    Color LightRadiance(0,0,0);
                     if (L.m_pMaterial->isSkyBox())
                     {
                         LightRadiance = static_cast<ImageBasedLight*>(L.m_pMaterial)->Radiance(L);
@@ -64,7 +64,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                         LightRadiance = static_cast<Light*>(L.m_pMaterial)->Radiance();
                     }
 
-                    Color explicitRadiance = W * (f / p) * LightRadiance * wMis;
+                    Color explicitRadiance = W * /*(f / p) **/ LightRadiance * wMis;
                     C += explicitRadiance;
                 }
 #pragma endregion
@@ -89,9 +89,9 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);
-                    wMis = (p * p) / (p * p + q * q);
-                    Color LightRadiance;
+                    //q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);
+                    wMis = 1.f;// (p * p) / (p * p + q * q);
+                    Color LightRadiance(0, 0, 0);
                     if (Q.m_pMaterial->isSkyBox())
                     {
                         LightRadiance = static_cast<ImageBasedLight*>(Q.m_pMaterial)->Radiance(Q);
@@ -101,8 +101,8 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                         LightRadiance = static_cast<Light*>(Q.m_pMaterial)->Radiance();
                     }
 
-                    Color radiance = W * LightRadiance * wMis;
-                    C += radiance;
+                    Color implicitRadiance = W * LightRadiance * wMis;
+                    C += implicitRadiance;
                     break;
                 }
 #pragma endregion
