@@ -24,7 +24,7 @@ float GeometryFactor(const Intersection & a_A, const Intersection & a_B)
 {
     Vector3f D = a_A.m_vPoint - a_B.m_vPoint;
     float dDotD = D.dot(D);
-    return fabsf( (a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD));
+    return fabsf( (a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD) );
 }
 
 Vector3f SampleLobe(const Vector3f & a_vNormal, float c, float phi)
@@ -48,14 +48,14 @@ float BRDF_TanTheta(const Vector3f & a_vA, const Vector3f& a_vB)
     float aDotB = a_vA.dot(a_vB);
     if (AreSimilar(aDotB, 0.f))
         return 0.f;
-    return sqrtf(1.f - (aDotB * aDotB)) / fabsf(aDotB);
+    //return sqrtf(1.f - (aDotB * aDotB)) / fabsf(aDotB);
+    return sqrtf(1.f - (aDotB * aDotB)) / aDotB;
 }
 
 float BRDF_D(const Vector3f & a_vM, const Vector3f& a_vNormal, float a_fAlpha)
 {
     float mDotN = a_vM.dot(a_vNormal);
     float x = BRDF_XPlus(mDotN);
-    float alphaSqr = (a_fAlpha * a_fAlpha);
 
     // a_fAlpha = 1 to infinity, infinity is smoothest
     return x * ((a_fAlpha + 2.f) / PI_2) * pow(mDotN, a_fAlpha);
@@ -64,7 +64,13 @@ float BRDF_D(const Vector3f & a_vM, const Vector3f& a_vNormal, float a_fAlpha)
 float BRDF_G1_A(float a_fA)
 {
     if (a_fA < 1.6f)
-        return (3.535f * a_fA + 2.181f * (a_fA * a_fA)) / (1.f + 2.276f * a_fA + 2.577f * (a_fA * a_fA));
+    {
+        float numerator = (3.535f * a_fA + 2.181f * (a_fA * a_fA));
+        float denom = (1.f + 2.276f * a_fA + 2.577f * (a_fA * a_fA));
+        if (AreSimilar(denom, 0.f))
+            return 0.f;
+        return numerator / denom;
+    }
     else
         return 1.f;
 }
@@ -77,17 +83,21 @@ float BRDF_G1(const Vector3f & a_vV, const Vector3f & a_vM, const Vector3f& a_vN
 
     float vDotN = a_vV.dot(a_vNormal);
     float vDotM = a_vV.dot(a_vM);
-    if (AreSimilar(vDotN, 0.f))
-        return 0.f;
     if (vDotN > 1.f)
         return 1.f;
-    float a = sqrtf(a_fAlpha / 2.f + 1.f) / tanTheta;
-    float x = BRDF_XPlus(vDotM / vDotN);
+
+    float x;
+    if (AreSimilar(vDotN, 0.f))
+        x = BRDF_XPlus(0.f);
+    else
+        x = BRDF_XPlus(vDotM / vDotN);
+    
+    float a = sqrtf((a_fAlpha / 2.f + 1.f)) / tanTheta;
 
     return x * BRDF_G1_A(a);
 }
 
-float BRDF_G(const Vector3f & a_vOmegaI, const Vector3f & a_vOmegaO, const Vector3f & a_vM, const Vector3f & a_vNormal, float a_fAlpha)
+float BRDF_G(const Vector3f& a_vOmegaO, const Vector3f& a_vOmegaI, const Vector3f & a_vM, const Vector3f & a_vNormal, float a_fAlpha)
 {
     return BRDF_G1(a_vOmegaI, a_vM, a_vNormal, a_fAlpha) * BRDF_G1(a_vOmegaO, a_vM, a_vNormal, a_fAlpha);
 }
@@ -96,9 +106,8 @@ Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
 {
     // F(L, H) = Ks + (1.f - Ks) *  pow(1.f - L.dot(H), 5)
     Color OneMinusKs = Color(1.f - a_cKs[0], 1.f - a_cKs[1], 1.f - a_cKs[2]);
-    float c = fabsf(a_vL.dot(a_vH));
-    float a = 1.f - c;
-    float b = pow(a, 5);
+    //float b = pow(1.f - fabsf(a_vL.dot(a_vH)), 5); // fabsf?
+    float b = pow(1.f - a_vL.dot(a_vH), 5); // fabsf?
     return a_cKs + OneMinusKs * b;
 }
 

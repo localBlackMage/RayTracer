@@ -72,8 +72,7 @@ void Sphere::GetRandomIntersectionPoint(Intersection & a_Intersection) const
         float r = sqrt(1 - (z*z));
         float a = 2 * PI*Xi2;
 
-        float normalMul = m_pMaterial->isSkyBox() ? -1.f : 1.f;
-        a_Intersection.m_vNormal = normalMul * Vector3f(r*cos(a), r*sin(a), z).normalized();
+        a_Intersection.m_vNormal = Vector3f(r*cos(a), r*sin(a), z).normalized();
         a_Intersection.m_vPoint = m_vCenter + (m_fRadius * a_Intersection.m_vNormal);
     }
 

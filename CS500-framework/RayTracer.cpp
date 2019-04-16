@@ -39,24 +39,21 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
             {
                 Vector3f omegaI;
                 Color f;
-                float p;
+                float p, q, wMis;
 #pragma region Explicit light connection
                 m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
                 p = m_pLights->PDFLight(L) / GeometryFactor(P, L);
 
                 // Probability the explicit light could be chosen implicitly
-                float q = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
-                float wMis = (p * p) / (p * p + q * q);
+                q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                wMis = (p * p) / (p * p + q * q);
                 omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
                 // Cast the shadow ray
                 Ray explicitRay = Ray(P.m_vPoint, omegaI);
-                if (p > 0.f && 
-                    m_pWorld->Hit(explicitRay, I) && 
-                    I.m_vPoint.isApprox(L.m_vPoint) && 
-                    I.m_pShape == L.m_pShape)
+                if (p > 0.f && m_pWorld->Hit(explicitRay, I) && I.m_vPoint.isApprox(L.m_vPoint) && I.m_pShape == L.m_pShape)
                 {
-                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, I.m_fT);
+                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
                     Color LightRadiance;
                     if (L.m_pMaterial->isSkyBox())
                     {
@@ -79,8 +76,8 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (!m_pWorld->Hit(extendedRay, Q))
                     break;
 
-                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, Q.m_fT);
-                p = P.m_pMaterial->PdfBRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
+                p = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
                 if (p < EPSILON)
                 {
                     break; // avoid division by 0
@@ -92,7 +89,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    q = m_pLights->PDFLight(L) / GeometryFactor(P, L);
+                    q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);
                     wMis = (p * p) / (p * p + q * q);
                     Color LightRadiance;
                     if (Q.m_pMaterial->isSkyBox())

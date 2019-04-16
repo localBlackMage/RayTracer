@@ -26,13 +26,17 @@ protected:
     void Eta(eDirection a_Direction, float& a_fEtaI, float& a_fEtaO);
     Color Attenuation(float a_fT, const Vector3f& a_vOmegaO, const Vector3f & a_vNormal);
 
-    Color Diffuse();
-    Color Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
-    Color Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT);
+    Color Scattering_Diffuse();
+    Color Scattering_Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI);
+    Color Scattering_Transmission(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI, float a_fT);
 
-    float PDFDiffuse(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
-    float PDFReflection(const Vector3f & a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
-    float PDFTransmission(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    float PDF_Diffuse(const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    float PDF_Reflection(const Vector3f & a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    float PDF_Transmission(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+
+    Vector3f BRDF_Diffuse(const Vector3f& a_vNormal);
+    Vector3f BRDF_Reflection(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal);
+    Vector3f BRDF_Transmission(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal);
 public:
     Color Kd, Ks, Kt;
     float alpha, m_IOR;
@@ -65,9 +69,9 @@ public:
     Material(Material& o) { Kd = o.Kd;  Ks = o.Ks; Kt = o.Kt; alpha = o.alpha; m_IOR = o.m_IOR; texid = o.texid; eMatType = o.eMatType; m_bIsLight = o.m_bIsLight; Initialize(); }
     virtual ~Material() {};
 
-    Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI, float a_fT);
+    Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 
-    float PdfBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
+    float PDF_BRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI);
 
     // Returns omega sub i
     Vector3f SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal);

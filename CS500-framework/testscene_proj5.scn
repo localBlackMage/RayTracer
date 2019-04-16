@@ -17,7 +17,7 @@ sphere -0.00000 -0.00000 -0.50000 0.3
 #mesh letterX.ply 0.975000 0.000000 0.420000 0.1  q 0.707107 0.000000 0.000000 0.707107
 #mesh letterY.ply 0.000000 0.975000 0.420000 0.1  q 1.000000 0.000000 0.000000 0.000000
 
-#ibl Barce_Rooftop_C_3k.hdr
-ibl Brooklyn_Bridge_Planks_2k.hdr
+ibl Barce_Rooftop_C_3k.hdr
+#ibl Brooklyn_Bridge_Planks_2k.hdr
 #ibl GravelPlaza_Env.hdr
 sphere 0 0 0 1000.0
