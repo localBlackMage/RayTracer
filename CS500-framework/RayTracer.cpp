@@ -50,7 +50,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
                 // Cast the shadow ray
-                Ray explicitRay = Ray(P.m_vPoint, omegaI); // + (omegaI * EPSILON)
+                Ray explicitRay = Ray(P.m_vPoint, omegaI);
                 if (p > 0.f && 
                     m_pWorld->Hit(explicitRay, I) && 
                     I.m_vPoint.isApprox(L.m_vPoint) && 
@@ -74,7 +74,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 
 #pragma region Extend Path
                 omegaI = P.m_pMaterial->SampleBRDF(omegaO, P.m_vNormal).normalized();
-                Ray extendedRay = Ray(P.m_vPoint, omegaI); /// + (omegaI * EPSILON)
+                Ray extendedRay = Ray(P.m_vPoint, omegaI);
 
                 if (!m_pWorld->Hit(extendedRay, Q))
                     break;

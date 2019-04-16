@@ -37,8 +37,5 @@ Ray Camera::GetBlurredRay(float a_fX, float a_fY)
 
     Vector3f start = m_vEye + rX * m_vX + rY * m_vY;
     Vector3f direction = (m_fDistToFocusPlane * a_fX - rX) * m_vX + (m_fDistToFocusPlane * a_fY - rY) * m_vY + m_fDistToFocusPlane * m_vZ;
-    return Ray(
-        start,
-        direction.normalized()
-    );
+    return Ray(start, direction.normalized());
 }
