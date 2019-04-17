@@ -45,15 +45,15 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 p = m_pLights->PDFLight(L) / GeometryFactor(P, L);
 
                 // Probability the explicit light could be chosen implicitly
-                q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI);// * RUSSIAN_ROULETTE;
-                wMis = 1.f;// (p * p) / (p * p + q * q);
+                q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                wMis = (p * p) / (p * p + q * q);
                 omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
                 // Cast the shadow ray
                 Ray explicitRay = Ray(P.m_vPoint, omegaI);
                 if (p > 0.f && m_pWorld->Hit(explicitRay, I) && I.m_vPoint.isApprox(L.m_vPoint) && I.m_pShape == L.m_pShape)
                 {
-                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
+                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, L.m_fT);
                     Color LightRadiance(0,0,0);
                     if (L.m_pMaterial->isSkyBox())
                     {
@@ -64,7 +64,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                         LightRadiance = static_cast<Light*>(L.m_pMaterial)->Radiance();
                     }
 
-                    Color explicitRadiance = W * /*(f / p) **/ LightRadiance * wMis;
+                    Color explicitRadiance = W * (f / p) * LightRadiance * wMis;
                     C += explicitRadiance;
                 }
 #pragma endregion
@@ -76,7 +76,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (!m_pWorld->Hit(extendedRay, Q))
                     break;
 
-                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI);
+                f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, Q.m_fT);
                 p = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
                 if (p < EPSILON)
                 {
@@ -89,8 +89,8 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    //q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);
-                    wMis = 1.f;// (p * p) / (p * p + q * q);
+                    q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);
+                    wMis = (p * p) / (p * p + q * q);
                     Color LightRadiance(0, 0, 0);
                     if (Q.m_pMaterial->isSkyBox())
                     {
@@ -103,6 +103,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 
                     Color implicitRadiance = W * LightRadiance * wMis;
                     C += implicitRadiance;
+
                     break;
                 }
 #pragma endregion
@@ -111,19 +112,16 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 P = Q;
                 omegaO = -omegaI;
             }
-
-            return C;
         }
     }
-    // No intersection, return C as is
+    
     return C;
 }
 
 RayTracer::RayTracer() :
     m_pCamera(nullptr),
     m_pWorld(new ShapeList()),
-    m_pLights(new ShapeList()),
-    m_fNumRaysPerPixel(8.f)
+    m_pLights(new ShapeList())
 {
 }
 
@@ -143,11 +141,6 @@ void RayTracer::SetCamera(const Vector3f & a_vEye, const Quaternionf & a_qOrient
         delete m_pCamera;
 
     m_pCamera = new Camera(a_vEye, a_qOrientation, float(m_uScreenWidth), float(m_uScreenHeight), a_fRY, a_fDistToFocusPlane, a_fSizeOfConfusionCircle);
-
-    if (a_fDistToFocusPlane > 0.f)
-    {
-
-    }
 }
 
 void RayTracer::AddSphere(const Vector3f & center, float r, Material * mat)

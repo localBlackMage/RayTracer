@@ -48,6 +48,8 @@ float BRDF_G(const Vector3f& a_vOmegaO, const Vector3f& a_vOmegaI, const Vector3
 
 Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs);
 
+Color BRDF_F_NotApprox(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs, float a_fEtaI, float a_fEtaO);
+
 
 float SignFN(float a_fVal);
 

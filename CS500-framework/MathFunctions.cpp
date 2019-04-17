@@ -88,7 +88,7 @@ float BRDF_G1(const Vector3f & a_vV, const Vector3f & a_vM, const Vector3f& a_vN
 
     float x;
     if (AreSimilar(vDotN, 0.f))
-        x = BRDF_XPlus(0.f);
+        return 0.f;
     else
         x = BRDF_XPlus(vDotM / vDotN);
     
@@ -107,8 +107,29 @@ Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
     // F(L, H) = Ks + (1.f - Ks) *  pow(1.f - L.dot(H), 5)
     Color OneMinusKs = Color(1.f - a_cKs[0], 1.f - a_cKs[1], 1.f - a_cKs[2]);
     //float b = pow(1.f - fabsf(a_vL.dot(a_vH)), 5); // fabsf?
-    float b = pow(1.f - a_vL.dot(a_vH), 5); // fabsf?
+    float b = pow(1.f - a_vL.dot(a_vH), 5);
     return a_cKs + OneMinusKs * b;
+}
+
+Color BRDF_F_NotApprox(const Vector3f & a_vL, const Vector3f & a_vH, const Color & a_cKs, float a_fEtaI, float a_fEtaO)
+{
+    float c = fabsf(a_vL.dot(a_vH));
+    float g = sqrtf(((a_fEtaO * a_fEtaO) / (a_fEtaI * a_fEtaI)) - 1.f + (c * c));
+    float gMinusC = g - c;
+    float gPlusC = g + c;
+
+    if (AreSimilar(gPlusC, 0.f))
+        return Color(0, 0, 0);
+
+    float dNum = ((c * gPlusC) - 1.f) * ((c * gPlusC) - 1.f);
+    float dDenom = ((c * gMinusC) - 1.f) * ((c * gMinusC) + 1.f);
+    float d;
+    if (AreSimilar(dDenom, 0.f))
+        d = 0.f;
+    else
+        d = dNum / dDenom;
+
+    return a_cKs * (0.5f * ((gMinusC * gMinusC) / (gPlusC * gPlusC)) * (1.f + d));
 }
 
 float SignFN(float a_fVal)

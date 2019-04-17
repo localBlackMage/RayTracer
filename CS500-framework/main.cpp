@@ -79,7 +79,9 @@ void WriteHdrImage(const std::string outName, const int width, const int height,
             Color pixel = LinearToGamma(image[y*width + x] / numPasses);
             *dp++ = pixel[0];
             *dp++ = pixel[1];
-            *dp++ = pixel[2]; } }
+            *dp++ = pixel[2]; 
+        } 
+    }
 
     // Write image to file in HDR (a.k.a RADIANCE) format
     rgbe_header_info info;

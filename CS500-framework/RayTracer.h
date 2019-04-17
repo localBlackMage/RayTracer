@@ -14,7 +14,6 @@ protected:
     ShapeList* m_pWorld;
     ShapeList* m_pLights;
     uint32 m_uScreenWidth, m_uScreenHeight;
-    float m_fNumRaysPerPixel = 10.f;
 
     Color PathTrace(const Ray& a_Ray, int a_iDepth);
 public:
