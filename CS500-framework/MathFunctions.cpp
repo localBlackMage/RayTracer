@@ -20,13 +20,6 @@ float GetDValueForPlane(const Vector3f & a_vNormal, const Vector3f & a_vPoint)
     return -a_vNormal.x() * a_vPoint.x() - a_vNormal.y() * a_vPoint.y() - a_vNormal.z() * a_vPoint.z();
 }
 
-float GeometryFactor(const Intersection & a_A, const Intersection & a_B)
-{
-    Vector3f D = a_A.m_vPoint - a_B.m_vPoint;
-    float dDotD = D.dot(D);
-    return fabsf( (a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD) );
-}
-
 Vector3f SampleLobe(const Vector3f & a_vNormal, float c, float phi)
 {
     float s = sqrtf(1.f - c * c);
@@ -106,8 +99,7 @@ Color BRDF_F(const Vector3f & a_vL, const Vector3f & a_vH, const Color& a_cKs)
 {
     // F(L, H) = Ks + (1.f - Ks) *  pow(1.f - L.dot(H), 5)
     Color OneMinusKs = Color(1.f - a_cKs[0], 1.f - a_cKs[1], 1.f - a_cKs[2]);
-    //float b = pow(1.f - fabsf(a_vL.dot(a_vH)), 5); // fabsf?
-    float b = pow(1.f - a_vL.dot(a_vH), 5);
+    float b = pow(1.f - fabsf(a_vL.normalized().dot(a_vH.normalized())), 5);
     return a_cKs + OneMinusKs * b;
 }
 

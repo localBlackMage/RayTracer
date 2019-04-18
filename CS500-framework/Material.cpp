@@ -6,7 +6,7 @@
 #include "Material.h"
 #endif //STB_IMAGE_IMPLEMENTATION
 
-#define MATERIAL_TRANSMISSION_ENABLED true
+#define MATERIAL_TRANSMISSION_ENABLED false
 
 Color operator*(const Color& lhs, const Pixel& rhs)
 {
@@ -128,16 +128,16 @@ Color Material::Scattering_Diffuse()
 
 Color Material::Scattering_Reflection(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, const Vector3f & a_vOmegaI)
 {
-    eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
-    float etaI, etaO;
-    Eta(direction, etaI, etaO);
+    //eDirection direction = IORDirection(a_vOmegaO, a_vNormal);
+    //float etaI, etaO;
+    //Eta(direction, etaI, etaO);
 
     Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
-    float DTerm = BRDF_D(m, a_vNormal, alpha);
-    float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
-    //Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
-    Color FTerm = BRDF_F_NotApprox(a_vOmegaI, m, Ks, etaI, etaO);
-    float denom = 4.f * fabsf(a_vOmegaI.dot(a_vNormal)) * fabsf(a_vOmegaO.dot(a_vNormal));
+    float DTerm = 1.f;// BRDF_D(m, a_vNormal, alpha);
+    float GTerm = 1.f;// BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+    Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
+    //Color FTerm = BRDF_F_NotApprox(a_vOmegaI, m, Ks, etaI, etaO);
+    float denom = 4.f * (a_vOmegaI.dot(a_vNormal)) * (a_vOmegaO.dot(a_vNormal));
     if (AreSimilar(denom, 0.f))
     {
         return Color(0, 0, 0);
@@ -357,7 +357,7 @@ Vector3f Material::SampleBRDF(const Vector3f& a_vOmegaO, const Vector3f& a_vNorm
 
 #pragma region IBL
 
-ImageBasedLight::ImageBasedLight(const std::string & _imageFileName)
+ImageBasedLight::ImageBasedLight(const std::string & _imageFileName) : Light()
 {
     LoadTexture(_imageFileName);
     m_Image.Preprocess();
@@ -455,7 +455,7 @@ Color ImageBasedLight::Radiance(const Intersection & a_Intersection)
 {
     Vector3f P = a_Intersection.m_vPoint;
     P.normalize();
-    double u = (/*m_Image.m_fAngle - */atan2(P[1], P[0])) / PI_2;
+    double u = (m_Image.m_fAngle - atan2(P[1], P[0])) / PI_2;
     u = u - floor(u);         // Wrap to be within 0...1
     double v = acos(P[2]) / PI;
     int i0 = floor(u*m_Image.m_Width);
@@ -493,7 +493,7 @@ void ImageBasedLight::SampleAsLight(Intersection & a_Intersection)
 
     int iv = pVPos - pVDist;
 
-    float phi = /*m_Image.m_fAngle - */PI_2 * (iu / float(m_Image.m_Width));
+    float phi = m_Image.m_fAngle - PI_2 * (iu / float(m_Image.m_Width));
     float theta = PI * (iv / float(m_Image.m_Height));
     
     a_Intersection.m_vNormal = Vector3f(sinf(theta) * cosf(phi),
@@ -505,20 +505,40 @@ float ImageBasedLight::PDFAsLight(const Intersection & a_Intersection)
 {
     Vector3f P = a_Intersection.m_vPoint;
     P.normalize();
-    double fu = (/*m_Image.m_fAngle - */atan2(P[1], P[0])) / PI_2;
+    double fu = (m_Image.m_fAngle - atan2(P[1], P[0])) / PI_2;
     fu = fu - floor(fu);         // Wrap to be within 0...1
     int u = floor(double(m_Image.m_Width) * fu);
     int v = floor(float(m_Image.m_Height) * acosf(P[2]) / PI);
+
     float angleFrac = PI / float(m_Image.m_Height);
+
+
+    //float invPdfNorm = (2.f * float(PI * PI)) / float(m_Image.m_Width * m_Image.m_Height);
+
+    //float* pVDist = &m_Image.m_pBuffer[m_Image.m_Height*u];
+    //// compute the actual PDF
+    //float pdfU = (u == 0) ? (m_Image.m_pUDist[0]) : (m_Image.m_pUDist[u] - m_Image.m_pUDist[u - 1]);
+    //pdfU /= m_Image.m_pUDist[m_Image.m_Width - 1];
+    //float pdfV = (v == 0) ? (pVDist[0]) : (pVDist[v] - pVDist[v - 1]);
+    //pdfV /= pVDist[m_Image.m_Height - 1];
+    //float theta = angleFrac * 0.5 + angleFrac * v;
+    //float invPdf = invPdfNorm / (pdfU * pdfV) * sin(theta);
+
+    //return invPdf;
+
+
     float* pVDist = &m_Image.m_pBuffer[m_Image.m_Height*u];
+    
     float pdfU = (u == 0) ? (m_Image.m_pUDist[0]) : (m_Image.m_pUDist[u] - m_Image.m_pUDist[u - 1]);
     pdfU /= m_Image.m_pUDist[m_Image.m_Width - 1];
     pdfU *= m_Image.m_Width / PI_2;
+    
     float pdfV = (v == 0) ? (pVDist[0]) : (pVDist[v] - pVDist[v - 1]);
     pdfV /= pVDist[m_Image.m_Height - 1];
     pdfV *= m_Image.m_Height / PI;
+    
     float theta = angleFrac * 0.5 + angleFrac * v;
-    float pdf = pdfU * pdfV*sinf(theta) / (4.f*PI*m_fRadius*m_fRadius);
+    float pdf = pdfU * pdfV*sinf(theta);// / (4.f*PI*m_fRadius*m_fRadius); // (Jacobian)
 
     //printf("(%f %f %f) %d %d %g\n", P[0], P[1], P[2], u, v, pdf);
 
@@ -526,3 +546,10 @@ float ImageBasedLight::PDFAsLight(const Intersection & a_Intersection)
 }
 
 #pragma endregion
+
+float Light::GeometryFactor(const Intersection & a_A, const Intersection & a_B)
+{
+    Vector3f D = a_A.m_vPoint - a_B.m_vPoint;
+    float dDotD = D.dot(D);
+    return fabsf((a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD));
+}

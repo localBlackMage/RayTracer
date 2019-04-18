@@ -24,13 +24,9 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
     Vector3f W = Vector3f(1, 1, 1); // Accumulated Weight
     if (m_pWorld->Hit(a_Ray, P))
     {
-        if (P.m_pMaterial->isSkyBox())
+        if (P.m_pMaterial->isLight())
         {
-            return static_cast<ImageBasedLight*>(P.m_pMaterial)->Radiance(P);
-        }
-        else if (P.m_pMaterial->isLight())
-        {
-            return static_cast<Light*>(P.m_pMaterial)->Radiance();
+            return static_cast<Light*>(P.m_pMaterial)->Radiance(P);
         }
         else
         {
@@ -42,7 +38,8 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 float p, q, wMis;
 #pragma region Explicit light connection
                 m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
-                p = m_pLights->PDFLight(L) / GeometryFactor(P, L);
+                Light* LMat = static_cast<Light*>(L.m_pMaterial);
+                p = m_pLights->PDFLight(L) / LMat->GeometryFactor(P, L);
 
                 // Probability the explicit light could be chosen implicitly
                 q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
@@ -55,13 +52,9 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 {
                     f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, L.m_fT);
                     Color LightRadiance(0,0,0);
-                    if (L.m_pMaterial->isSkyBox())
+                    if (L.m_pMaterial->isLight())
                     {
-                        LightRadiance = static_cast<ImageBasedLight*>(L.m_pMaterial)->Radiance(L);
-                    }
-                    else if (L.m_pMaterial->isLight())
-                    {
-                        LightRadiance = static_cast<Light*>(L.m_pMaterial)->Radiance();
+                        LightRadiance = LMat->Radiance(L);
                     }
 
                     Color explicitRadiance = W * (f / p) * LightRadiance * wMis;
@@ -89,16 +82,13 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);
+                    Light* QMat = static_cast<Light*>(Q.m_pMaterial);
+                    q = m_pLights->PDFLight(Q) / QMat->GeometryFactor(P, Q);
                     wMis = (p * p) / (p * p + q * q);
                     Color LightRadiance(0, 0, 0);
-                    if (Q.m_pMaterial->isSkyBox())
+                    if (Q.m_pMaterial->isLight())
                     {
-                        LightRadiance = static_cast<ImageBasedLight*>(Q.m_pMaterial)->Radiance(Q);
-                    }
-                    else if (Q.m_pMaterial->isLight())
-                    {
-                        LightRadiance = static_cast<Light*>(Q.m_pMaterial)->Radiance();
+                        LightRadiance = QMat->Radiance(Q);
                     }
 
                     Color implicitRadiance = W * LightRadiance * wMis;

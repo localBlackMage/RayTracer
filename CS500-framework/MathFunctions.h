@@ -35,9 +35,6 @@ void SwapValues(T& a_A, T& a_B)
 
 float GetDValueForPlane(const Vector3f& a_vNormal, const Vector3f& a_vPoint);
 
-struct Intersection;
-float GeometryFactor(const Intersection& a_A, const Intersection& a_B);
-
 // c = cosine of m_fAngle between vector and a_vNormal
 // phi = m_fAngle around a_vNormal
 Vector3f SampleLobe(const Vector3f& a_vNormal, float c, float phi);

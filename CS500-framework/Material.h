@@ -3,14 +3,6 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-enum eMaterialType : uint32
-{
-    eMaterialType_Lambertian = 0,
-    eMaterialType_Metal,
-
-    eMaterialType_MAX
-};
-
 enum eDirection : uint32 {
     eDirection_InsideToOutside = 0,
     eDirection_OutsideToInside,
@@ -41,8 +33,6 @@ public:
     Color Kd, Ks, Kt;
     float alpha, m_IOR;
     unsigned int texid;
-    eMaterialType eMatType;
-    bool m_bIsLight;
 
     virtual bool isLight() { return false; }
     virtual bool isSkyBox() { return false; }
@@ -53,20 +43,16 @@ public:
         Kt(Color(1, 1, 1)),
         alpha(1.f), 
         m_IOR(1.f),
-        texid(0),
-        eMatType(eMaterialType_Lambertian),
-        m_bIsLight(false)
+        texid(0)
     {
         Initialize();
     }
     Material(const Color d, const Color s, const Color t, const float a, const float ior, bool a_bIsLight = false) :
-        Kd(d), Ks(s), Kt(t), alpha(a), m_IOR(ior), texid(0),
-        eMatType(eMaterialType_Lambertian),
-        m_bIsLight(a_bIsLight)
+        Kd(d), Ks(s), Kt(t), alpha(a), m_IOR(ior), texid(0)
     {
         Initialize();
     }
-    Material(Material& o) { Kd = o.Kd;  Ks = o.Ks; Kt = o.Kt; alpha = o.alpha; m_IOR = o.m_IOR; texid = o.texid; eMatType = o.eMatType; m_bIsLight = o.m_bIsLight; Initialize(); }
+    Material(Material& o) { Kd = o.Kd;  Ks = o.Ks; Kt = o.Kt; alpha = o.alpha; m_IOR = o.m_IOR; texid = o.texid; Initialize(); }
     virtual ~Material() {};
 
     Color EvalScattering(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal, const Vector3f& a_vOmegaI, float a_fT);
@@ -84,12 +70,13 @@ class Light : public Material
 {
 public:
 
-    Light(const Color e) : Material() { m_bIsLight = true; Kd = e; }
+    Light() : Material() {}
+    Light(const Color e) : Material() { Kd = e; }
     virtual bool isLight() { return true; }
     virtual bool isSkyBox() { return false; }
-    //virtual void apply(const unsigned int program);
 
-    virtual Color Radiance() const { return Kd; }
+    virtual Color Radiance(const Intersection & a_Intersection) const { return Kd; }
+    virtual float GeometryFactor(const Intersection& a_A, const Intersection& a_B);
 };
 
 struct Pixel
@@ -106,7 +93,7 @@ Color operator*(const Pixel& lhs, const float& rhs);
 Color operator*(const float& lhs, const Pixel& rhs);
 
 struct HDRImage {
-    std::vector<Pixel> m_Data;
+    std::vector<Pixel> m_Data; // Original pixels
     int m_Width, m_Height, m_NumChannels;
     float* m_pBuffer;
     float* m_pUDist;
@@ -115,7 +102,7 @@ struct HDRImage {
     void Preprocess();
 };
 
-class ImageBasedLight : public Material
+class ImageBasedLight : public Light
 {
 protected:
     HDRImage m_Image;
@@ -126,10 +113,11 @@ public:
     ImageBasedLight(const std::string& _imageFileName);
     virtual bool isLight() { return true; }
     virtual bool isSkyBox() { return true; }
+    virtual Color Radiance(const Intersection & a_Intersection);
+    virtual float GeometryFactor(const Intersection& a_A, const Intersection& a_B) { return 1.f; }
 
     void SetRadius(float a_fRadius) { m_fRadius = a_fRadius; }
     const HDRImage& Image() { return m_Image; }
-    virtual Color Radiance(const Intersection & a_Intersection);
     void SampleAsLight(Intersection& a_Intersection);
     float PDFAsLight(const Intersection & a_Intersection);
 };
