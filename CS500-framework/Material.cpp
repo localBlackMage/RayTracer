@@ -6,7 +6,7 @@
 #include "Material.h"
 #endif //STB_IMAGE_IMPLEMENTATION
 
-#define MATERIAL_TRANSMISSION_ENABLED false
+#define MATERIAL_TRANSMISSION_ENABLED true
 
 Color operator*(const Color& lhs, const Pixel& rhs)
 {
@@ -41,15 +41,16 @@ eDirection IORDirection(const Vector3f& a_vOmegaO, const Vector3f& a_vNormal)
 
 float CalculateIOR(eDirection a_Direction, float a_fIOR)
 {
+    constexpr float IOR_AIR = 1.000293f;
     switch (a_Direction)
     {
         case eDirection_InsideToOutside:
         {
-            return 1.f / a_fIOR;
+            return IOR_AIR / a_fIOR;
         }
         case eDirection_OutsideToInside:
         {
-            return a_fIOR / 1.f;
+            return a_fIOR / IOR_AIR;
         }
         case eDirection_Parallel:
         default:
@@ -133,8 +134,8 @@ Color Material::Scattering_Reflection(const Vector3f& a_vOmegaO, const Vector3f 
     //Eta(direction, etaI, etaO);
 
     Vector3f m = (a_vOmegaO + a_vOmegaI).normalized();
-    float DTerm = 1.f;// BRDF_D(m, a_vNormal, alpha);
-    float GTerm = 1.f;// BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
+    float DTerm = BRDF_D(m, a_vNormal, alpha);
+    float GTerm = BRDF_G(a_vOmegaO, a_vOmegaI, m, a_vNormal, alpha);
     Color FTerm = BRDF_F(a_vOmegaI, m, Ks);
     //Color FTerm = BRDF_F_NotApprox(a_vOmegaI, m, Ks, etaI, etaO);
     float denom = 4.f * (a_vOmegaI.dot(a_vNormal)) * (a_vOmegaO.dot(a_vNormal));
@@ -283,7 +284,7 @@ float Material::PDF_BRDF(const Vector3f& a_vOmegaO, const Vector3f & a_vNormal, 
 
     return Pd * newPD + Pr * newPR + Pt * newPT;
 #else
-    return Pd * newPD + Pr * newPR;
+    return newPD * Pd + newPR * Pr;
 #endif
 }
 
@@ -551,5 +552,7 @@ float Light::GeometryFactor(const Intersection & a_A, const Intersection & a_B)
 {
     Vector3f D = a_A.m_vPoint - a_B.m_vPoint;
     float dDotD = D.dot(D);
-    return fabsf((a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D)) / (dDotD * dDotD));
+    float numerator = a_A.m_vNormal.dot(D) * a_B.m_vNormal.dot(D);
+    float denom = (dDotD * dDotD);
+    return fabsf(numerator / denom);
 }

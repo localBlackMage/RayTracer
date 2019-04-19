@@ -16,6 +16,35 @@ Color operator*(const Color& lhs, const Color& rhs)
     return Color(rhs[0] * lhs[0], rhs[1] * lhs[1], rhs[2] * lhs[2]);
 }
 
+Color operator*(const Color& lhs, const float& rhs)
+{
+    return Color(rhs * lhs[0], rhs * lhs[1], rhs * lhs[2]);
+}
+
+Color operator*(const float& lhs, const Color& rhs)
+{
+    return rhs * lhs;
+}
+
+Color Radiance(const Intersection& I)
+{
+    if (I.m_pMaterial->isSkyBox())
+        return static_cast<ImageBasedLight*>(I.m_pMaterial)->Radiance(I);
+    else
+        return static_cast<Light*>(I.m_pMaterial)->Radiance(I);
+}
+
+float GeometryFactor(const Intersection& A, const Intersection& B)
+{
+    float geometryFactor;
+    if (B.m_pMaterial->isSkyBox())
+        geometryFactor = 1.f;
+    else
+        geometryFactor = static_cast<Light*>(B.m_pMaterial)->GeometryFactor(A, B);
+
+    return geometryFactor;
+}
+
 Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
 {
     // Initial Ray
@@ -26,7 +55,7 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
     {
         if (P.m_pMaterial->isLight())
         {
-            return static_cast<Light*>(P.m_pMaterial)->Radiance(P);
+            return Radiance(P);
         }
         else
         {
@@ -37,29 +66,22 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 Color f;
                 float p, q, wMis;
 #pragma region Explicit light connection
-                m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
-                Light* LMat = static_cast<Light*>(L.m_pMaterial);
-                p = m_pLights->PDFLight(L) / LMat->GeometryFactor(P, L);
+                //m_pLights->SampleLight(L); // Randomly chosen light, a randomly chosen point on that light and it's normal
+                //Light* LMat = static_cast<Light*>(L.m_pMaterial);
+                //p = m_pLights->PDFLight(L) / GeometryFactor(P, L);  //QMat->GeometryFactor(P, L);
+                //// Probability the explicit light could be chosen implicitly
+                //q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
+                //wMis = (p * p) / (p * p + q * q);
+                //omegaI = (L.m_vPoint - P.m_vPoint).normalized();
 
-                // Probability the explicit light could be chosen implicitly
-                q = P.m_pMaterial->PDF_BRDF(omegaO, P.m_vNormal, omegaI) * RUSSIAN_ROULETTE;
-                wMis = (p * p) / (p * p + q * q);
-                omegaI = (L.m_vPoint - P.m_vPoint).normalized();
-
-                // Cast the shadow ray
-                Ray explicitRay = Ray(P.m_vPoint, omegaI);
-                if (p > 0.f && m_pWorld->Hit(explicitRay, I) && I.m_vPoint.isApprox(L.m_vPoint) && I.m_pShape == L.m_pShape)
-                {
-                    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, L.m_fT);
-                    Color LightRadiance(0,0,0);
-                    if (L.m_pMaterial->isLight())
-                    {
-                        LightRadiance = LMat->Radiance(L);
-                    }
-
-                    Color explicitRadiance = W * (f / p) * LightRadiance * wMis;
-                    C += explicitRadiance;
-                }
+                //// Cast the shadow ray
+                //Ray explicitRay = Ray(P.m_vPoint, omegaI);
+                //if (p > 0.f && m_pWorld->Hit(explicitRay, I) && I.m_vPoint.isApprox(L.m_vPoint) && I.m_pShape == L.m_pShape)
+                //{
+                //    f = P.m_pMaterial->EvalScattering(omegaO, P.m_vNormal, omegaI, L.m_fT);
+                //    Color explicitRadiance = W * (f / p) * Radiance(L) * wMis;
+                //    C += explicitRadiance;
+                //}
 #pragma endregion
 
 #pragma region Extend Path
@@ -82,16 +104,9 @@ Color RayTracer::PathTrace(const Ray & a_Ray, int a_iDepth)
                 if (Q.m_pMaterial->isLight())
                 {
                     // Probability the implicit light could be chosen explicitly
-                    Light* QMat = static_cast<Light*>(Q.m_pMaterial);
-                    q = m_pLights->PDFLight(Q) / QMat->GeometryFactor(P, Q);
+                    q = m_pLights->PDFLight(Q) / GeometryFactor(P, Q);  //QMat->GeometryFactor(P, Q);
                     wMis = (p * p) / (p * p + q * q);
-                    Color LightRadiance(0, 0, 0);
-                    if (Q.m_pMaterial->isLight())
-                    {
-                        LightRadiance = QMat->Radiance(Q);
-                    }
-
-                    Color implicitRadiance = W * LightRadiance * wMis;
+                    Color implicitRadiance = W * Radiance(Q) * wMis;
                     C += implicitRadiance;
 
                     break;
